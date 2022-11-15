@@ -1,29 +1,38 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Vue from "vue"
+import VueRouter from "vue-router"
+import IndexView from "@/views/IndexView.vue"
+import DetailView from "@/views/DetailView.vue"
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: "/",
+    name: "index",
+    component: IndexView,
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
+    path: "/detail/:tmdb_id",
+    name: "detail",
+    component: DetailView,
+    // component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+  },
+  // {
+  //   path: "/community",
+  //   name: "comunity",
+  //   component: DetailView,
+  // },
+  // {
+  //   path: "/post/:article_pk",
+  //   name: "comunity",
+  //   component: DetailView,
+  // },
 ]
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
+  routes,
 })
 
 export default router

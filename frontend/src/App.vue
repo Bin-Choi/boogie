@@ -1,10 +1,12 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link :to="{ name: 'index' }">Index</router-link> |
+      <router-link :to="{ name: 'detail', params: { tmdb_id: 567 } }"
+        >Detail</router-link
+      >
     </nav>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
