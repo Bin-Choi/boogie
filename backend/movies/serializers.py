@@ -40,7 +40,7 @@ class MovieSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Movie
-        fields = '__all__'
+        exclude = ('like_users',)
 
 class ReviewSerializer(serializers.ModelSerializer):
     movie = MovieNameSerializer(many=True, read_only=True)
