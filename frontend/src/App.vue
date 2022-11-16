@@ -1,10 +1,13 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link :to="{ name: 'index' }">Index</router-link> |
+      <router-link :to="{ name: 'detail', params: { tmdb_id: 129 } }"
+        >Detail</router-link
+      >|
+      <router-link :to="{ name: 'community' }">자유게시판</router-link>
     </nav>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
@@ -15,18 +18,20 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: #F9F4F4; 
 }
 
 nav {
-  padding: 30px;
+  background-color: #56357B;
+  padding: 15px;
 }
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #B9A0D4;
 }
 
 nav a.router-link-exact-active {
-  color: #42b983;
+  color: #FFFFFF;
 }
 </style>
