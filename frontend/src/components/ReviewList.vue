@@ -1,15 +1,21 @@
 <template>
   <div>
-    <h1>ReviewList</h1>
-    <review-list-item />
+    <h4>한줄평</h4>
+    <ReviewListItem v-for="(review, index) in reviews" :key="index" :review="review"/>
   </div>
 </template>
 
 <script>
 import ReviewListItem from "./ReviewListItem.vue"
+
 export default {
-  components: { ReviewListItem },
   name: "ReviewList",
+  components: { ReviewListItem },
+  data() {
+    return {
+      reviews: []
+    }
+  }
 }
 </script>
 

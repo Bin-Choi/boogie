@@ -4,17 +4,18 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 class Director(models.Model):
-    tmbd_id = models.IntegerField()
+    tmdb_id = models.IntegerField()
     name = models.CharField(max_length= 30)
+    profile_path = models.CharField(max_length=200, blank=True)
 
 class Actor(models.Model):
     tmdb_id = models.IntegerField()
     name = models.CharField(max_length = 30)
+    profile_path = models.CharField(max_length=200, blank=True)
 
 class Genre(models.Model):
     tmdb_id = models.IntegerField()
     name = models.CharField(max_length = 30)
-
 
 class Movie(models.Model):
     tmdb_id = models.IntegerField()
@@ -23,12 +24,12 @@ class Movie(models.Model):
     country = models.CharField(max_length=30)
     vote_count = models.IntegerField()
     vote_average = models.FloatField()
-    overview = models.TextField()
-    poster_path = models.CharField(max_length=200)
-    backdrop_path = models.CharField(max_length=200)
+    overview = models.TextField(blank=True)
+    poster_path = models.CharField(max_length=200, blank=True)
+    backdrop_path = models.CharField(max_length=200, blank=True)
     actors = models.ManyToManyField(Actor, related_name = "movies")
     genres = models.ManyToManyField(Genre, related_name = "movies")
-    director = models.ManyToManyField(Director, related_name = "movies")
+    directors = models.ManyToManyField(Director, related_name = "movies")
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name = "like_movies")
 
 class Review(models.Model):

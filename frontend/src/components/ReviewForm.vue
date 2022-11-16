@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1>ReviewForm</h1>
+    <span>⭐⭐⭐⭐⭐</span>
+    <input type="text"><button>작성</button>
   </div>
 </template>
 
