@@ -10,11 +10,11 @@
 </template>
 
 <script>
-import CommentListItem from "./CommentListItem.vue"
+import CommentListItem from '@/components/CommentListItem.vue'
 
 export default {
   components: { CommentListItem },
-  name: "CommentList",
+  name: 'CommentList',
   computed: {
     comments() {
       return this.$store.state.comments

@@ -5,9 +5,12 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.shortcuts import render
 
-from .serializers import MovieListSerializer, MovieSerializer, MovieNameSerializer, DirectorNameSerializer, GenreNameSerializer, ReviewSerializer
+from django.contrib.auth import get_user_model
+
+from .serializers import MovieListSerializer, MovieSerializer, MovieNameSerializer, GenreNameSerializer, ReviewSerializer
 from .models import Movie, Actor, Genre, Director, Review
 import requests
+from django.db.models import Q
 
 # Create your views here.
 @api_view(['GET'])
@@ -19,8 +22,36 @@ def movie_detail(request, tmdb_id):
 def movie_recent(request, num):
     pass
 
-def review_recent(request, num):
+def review_list_recent(request, num):
     pass
+
+def review_list_user(request):
+    pass
+
+@api_view(['GET', 'POST'])
+def review_list_movie(request, movie_id):
+    if request.method == 'GET':
+        other_reviews = list(Review.objects.filter(Q(movie=movie_id) & ~Q(user=2)).order_by('created_at'))
+        my_review = list(Review.objects.filter(movie=movie_id, user=2))
+        reviews = my_review + other_reviews
+        serializer = ReviewSerializer(reviews, many=True)
+
+        is_voted = False
+        if my_review:
+            is_voted = True
+
+        data = {
+            'isVoted': is_voted,
+            'reviews': serializer.data,
+        }
+        return Response(data)
+
+    elif request.method == 'POST':
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            User = get_user_model()
+            serializer.save(user=User.objects.get(username='admin2'), movie=Movie.objects.get(tmdb_id=movie_id))
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 def fill_data(request):
     # genres
@@ -117,4 +148,8 @@ def fill_data(request):
                 m.directors.add(d)
 
 
-    
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+    review.delete()
+    return Response({'result': 1,})
+

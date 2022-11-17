@@ -1,54 +1,54 @@
 <template>
-  <div>
-    <h3>{{movie?.title}}</h3>
-    <ul>
-      <VideoListItem v-for="(video, index) in videoList" :key = "index" :video="video" @play="play"/>
-    </ul>
+  <div id="video-list" class="p-3">
+    <h4 class="fw-bold">예고편</h4>
+    <VideoListItem
+      v-for="(video, index) in videoList"
+      :key="index"
+      :video="video"
+    />
   </div>
 </template>
 
 <script>
-import VideoListItem from './VideoListItem.vue';
-import axios from 'axios'
+import VideoListItem from './VideoListItem.vue'
+// import axios from 'axios'
 
 export default {
-  name: "VideoList",
+  name: 'VideoList',
   components: {
     VideoListItem,
-  },
-  props: {
-    movie: Object,
   },
   data() {
     return {
       videoList: [],
     }
   },
-  methods: {
-    getVideoList(){
-      const title = this.movie.title
-      const params = {
-        key: 'AIzaSyAqe-pKnjEB4hsDDn8Cjmge-OVYOb_aZ7w',
-        part: 'snippet',
-        type: 'video',
-        q: title
-      }
-      axios({
-        method: 'get',
-        url: 'https://www.googleapis.com/youtube/v3/search',
-        params
-      })
-      .then((res) => {
-        this.videoList = res.data.items.slice((0,4))
-        // this.videoList = res.data.items
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+  computed: {
+    movie() {
+      return this.$store.state.movie
     },
-    play(video){
-      this.video = video
-    }
+  },
+  methods: {
+    getVideoList() {
+      // const params = {
+      //   key: 'AIzaSyAf1G4zWkG8KhIs062j2OEModwcv_O_PZg',
+      //   part: 'snippet',
+      //   type: 'video',
+      //   q: this.movie.title + '예고편',
+      // }
+      // axios({
+      //   method: 'get',
+      //   url: 'https://www.googleapis.com/youtube/v3/search',
+      //   params,
+      // })
+      //   .then((res) => {
+      //     this.videoList = res.data.items.slice(0, 3)
+      //     // this.videoList = res.data.items
+      //   })
+      //   .catch((err) => {
+      //     console.log(err)
+      //   })
+    },
   },
   created() {
     this.getVideoList()
@@ -56,4 +56,8 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+#video-list {
+  background-color: white;
+}
+</style>
