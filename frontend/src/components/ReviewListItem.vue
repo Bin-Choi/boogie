@@ -1,9 +1,8 @@
 <template>
   <div
-    @mouseover="over"
-    @mouseout="out"
-    class="d-flex justify-content-between mt-3"
-  >
+    @mouseenter="hover = !hover"
+    @mouseleave="hover = !hover"
+    class="d-flex justify-content-between mt-3">
     <div>
       <img :src="starsPath" style="width: 150px" />
       <span class="fs-6 fw-bold" style="margin-left: 20px">{{
@@ -11,7 +10,11 @@
       }}</span>
     </div>
     <span style="color: gray">{{ review.username }}</span>
-    <button type="button" class="btn btn-warning" @click="deleteReview">
+    <button
+      v-if="hover"
+      type="button"
+      class="btn btn-danger"
+      @click="deleteReview">
       X
     </button>
   </div>
@@ -49,7 +52,7 @@ export default {
         url: `${API_URL}/movies/reviews/${this.review.id}/`,
       })
         .then(() => {
-          this.$store.dispatch('getReviews')
+          this.$store.dispatch('getReviews', this.$route.params.tmdb_id)
         })
         .catch((err) => {
           console.log(err)

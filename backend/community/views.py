@@ -32,7 +32,6 @@ def post_detail(request, post_pk):
 
     if request.method == 'GET':
         serializer = PostSerializer(post)
-        print(serializer.data)
         return Response(serializer.data)
     
     elif request.method == 'DELETE':
@@ -45,12 +44,36 @@ def post_detail(request, post_pk):
             serializer.save()
             return Response(serializer.data)
         
-@api_view(['GET'])
-def comment_list(request):
+@api_view(['GET', 'POST'])
+def comment_list(request, post_pk):
     if request.method == 'GET':
-        comments = get_list_or_404(Comment)
+        comments = Comment.objects.filter(post=post_pk, original_comment=None)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
+    elif request.method == 'POST':
+        post = get_object_or_404(Post, pk=post_pk)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            # serializer.save()
+            User = get_user_model()
+            serializer.save(user=User.objects.get(username='admin'), post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET', 'POST'])
+def recomment_list(request, post_pk, comment_pk):
+    if request.method == 'GET':
+        comments = Comment.objects.filter(post=post_pk, original_comment=comment_pk)
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        post = get_object_or_404(Post, pk=post_pk)
+        original_comment = Comment.objects.get(pk=comment_pk)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            # serializer.save()
+            User = get_user_model()
+            serializer.save(user=User.objects.get(username='admin'), post=post, original_comment=original_comment)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     
 @api_view(['GET', 'DELETE', 'PUT'])

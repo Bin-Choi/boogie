@@ -5,8 +5,7 @@
     <ReviewListItem
       v-for="(review, index) in reviews"
       :key="index"
-      :review="review"
-    />
+      :review="review" />
   </div>
 </template>
 
@@ -26,7 +25,7 @@ export default {
   },
   methods: {},
   created() {
-    this.$store.dispatch('getReviews')
+    this.$store.dispatch('getReviews', this.$route.params.tmdb_id)
   },
 }
 </script>

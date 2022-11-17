@@ -1,0 +1,13 @@
+[
+{
+    "model": "movies.review",
+    "pk": 8,
+    "fields": {
+        "movie": 129,
+        "user": 2,
+        "content": "왜 삭제가 깔끄마게 안될 까 ?",
+        "vote": 4,
+        "created_at": "2022-11-17T12:01:10.245Z"
+    }
+}
+]

@@ -1,0 +1,26 @@
+[
+{
+    "model": "community.post",
+    "pk": 1,
+    "fields": {
+        "title": "작성",
+        "content": "되나요?",
+        "created_at": "2022-11-17T11:03:41.593Z",
+        "updated_at": "2022-11-17T11:03:41.593Z",
+        "user": 1,
+        "like_users": []
+    }
+},
+{
+    "model": "community.post",
+    "pk": 2,
+    "fields": {
+        "title": "잠이왜오냐",
+        "content": "미쳤다",
+        "created_at": "2022-11-17T11:03:55.259Z",
+        "updated_at": "2022-11-17T11:03:55.259Z",
+        "user": 1,
+        "like_users": []
+    }
+}
+]

@@ -20,7 +20,8 @@ class PostSerializer(serializers.ModelSerializer):
         read_only_fields = ('user',)
 
 class CommentSerializer(serializers.ModelSerializer):
-
+    username = serializers.CharField(source='user.username', read_only=True)
+    
     class Meta:
         model = Comment
         fields = '__all__'

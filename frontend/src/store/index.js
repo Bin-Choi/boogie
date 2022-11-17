@@ -15,7 +15,7 @@ export default new Vuex.Store({
     posts: [],
     reviews: [],
     movie: null,
-    isVoted: false,
+    // isVoted: false,
   },
   getters: {},
   mutations: {
@@ -28,9 +28,9 @@ export default new Vuex.Store({
     GET_REVIEWS(state, reviews) {
       state.reviews = reviews
     },
-    SWITCH_IS_VOTED(state, boolValue) {
-      state.isVoted = boolValue
-    },
+    // SWITCH_IS_VOTED(state, boolValue) {
+    //   state.isVoted = boolValue
+    // },
     // DELETE_FIRST_REVIEW(state) {
     //   state.reviews.splice(0, 1)
     // },
@@ -66,10 +66,10 @@ export default new Vuex.Store({
         context.commit(res.data.key)
       })
     },
-    getReviews(context) {
+    getReviews(context, movie_id) {
       axios({
         method: 'get',
-        url: `${API_URL}/movies/reviews/movie/${this.movie.id}/`,
+        url: `${API_URL}/movies/reviews/movie/${movie_id}/`,
       })
         .then((res) => {
           context.commit('GET_REVIEWS', res.data.reviews)
