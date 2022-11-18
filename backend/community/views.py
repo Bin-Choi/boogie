@@ -2,6 +2,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 
+# permission Decorators
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.contrib.auth import get_user_model
 from .serializers import PostSerializer, PostListSerializer, CommentSerializer
@@ -19,14 +23,16 @@ def post_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = PostSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            # serializer.save()
-            User = get_user_model()
-            serializer.save(user=User.objects.get(username='admin'))
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.user.is_authenticated:
+            serializer = PostSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                # serializer.save()
+                serializer.save(user=request.user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET', 'DELETE', 'PUT'])
+# @permission_classes([IsAuthenticated])
 def post_detail(request, post_pk):
     post = get_object_or_404(Post, pk=post_pk)
 

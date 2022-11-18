@@ -30,10 +30,16 @@ def review_list_user(request):
 
 @api_view(['GET', 'POST'])
 def review_list_movie(request, movie_pk):
+    movie=Movie.objects.get(id=movie_pk)
     if request.method == 'GET':
-        other_reviews = list(Review.objects.filter(Q(movie=movie_pk) & ~Q(user=2)).order_by('created_at'))
-        my_review = list(Review.objects.filter(movie=movie_pk, user=2))
+        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '1')
+        other_reviews = list(Review.objects.filter(Q(movie=movie) & ~Q(user=request.user)).order_by('created_at'))
+        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '2')
+        my_review = list(Review.objects.filter(movie=movie, user=request.user))
+        # print(request.user.name, request.user.id)
+        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '3')
         reviews = my_review + other_reviews
+        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '4')
         serializer = ReviewSerializer(reviews, many=True)
 
         is_voted = False
@@ -48,17 +54,18 @@ def review_list_movie(request, movie_pk):
 
     elif request.method == 'POST':
         serializer = ReviewSerializer(data=request.data)
-        print(request.data)
         if serializer.is_valid(raise_exception=True):
-            User = get_user_model()
-            serializer.save(user=User.objects.get(username='admin2'), movie=Movie.objects.get(id=movie_pk))
+            serializer.save(user=request.user, movie=movie)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@api_view(['DELETE'])
 def delete_review(request, pk):
     review = get_object_or_404(Review, pk=pk)
-    review.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    if review.user == request.user:
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_403_FORBIDDEN)
 
 # def fill_data(request):
 #     # genres

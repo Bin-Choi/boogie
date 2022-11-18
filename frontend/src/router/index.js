@@ -5,6 +5,8 @@ import MovieDetailView from '@/views/MovieDetailView.vue'
 import CommunityView from '@/views/CommunityView.vue'
 import PostDetailView from '@/views/PostDetailView.vue'
 import PostCreateView from '@/views/PostCreateView.vue'
+import SignUpView from '@/views/SignUpView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 Vue.use(VueRouter)
 
@@ -34,6 +36,16 @@ const routes = [
     path: '/posts/:post_pk',
     name: 'post_detail',
     component: PostDetailView,
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    component: SignUpView,
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView,
   },
 ]
 

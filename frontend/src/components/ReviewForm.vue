@@ -112,9 +112,9 @@ export default {
           vote: vote,
           content: content,
         },
-        // headers: {
-        //   Authorization: `Token ${this.$store.state.token}`
-        // }
+        headers: {
+          Authorization: `Token ${this.$store.state.token}`,
+        },
       })
         .then(() => {
           const stars = document.querySelectorAll('#stars img')

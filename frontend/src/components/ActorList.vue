@@ -6,8 +6,7 @@
         v-for="actor in actors"
         :actor="actor"
         :key="actor.name"
-        style="margin-right: 30px"
-      />
+        style="margin-right: 30px" />
     </div>
   </div>
 </template>

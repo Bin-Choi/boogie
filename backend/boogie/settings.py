@@ -36,6 +36,17 @@ INSTALLED_APPS = [
     'movies',
 
     'rest_framework',
+    # Auth
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+
+    
+    # registration
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
 
     # CORS policy
     "corsheaders",
@@ -47,6 +58,31 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+SITE_ID = 1
+
+REST_FRAMEWORK = {
+    # Authentication
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+
+    # permission
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',  # 모든 요청에 대해 허용 후, url 개별적으로 제한
+    ],
+
+    # spectacular Settings
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -61,6 +97,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+
+# CORS_ALLOW_ORIGINS = []
 CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'boogie.urls'

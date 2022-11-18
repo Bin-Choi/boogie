@@ -40,12 +40,15 @@ export default {
       axios({
         method: 'get',
         url: `${API_URL}/community/posts/${this.$route.params.post_pk}`,
+        // headers: {
+        //   Authorization: `Token ${this.$store.state.token}`,
+        // },
       })
         .then((res) => {
           this.post = res.data
         })
-        .catch((err) => {
-          console.log(err)
+        .catch(() => {
+          this.$router.push({ name: 'index' })
         })
     },
   },

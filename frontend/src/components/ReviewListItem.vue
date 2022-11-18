@@ -11,7 +11,7 @@
     </div>
     <span style="color: gray">{{ review.username }}</span>
     <button
-      v-if="hover"
+      v-if="hover && review.username === user.username"
       type="button"
       class="btn btn-danger"
       @click="deleteReview">
@@ -38,6 +38,9 @@ export default {
     starsPath() {
       return require(`@/assets/stars_${this.review.vote}.png`)
     },
+    user() {
+      return this.$store.state.user
+    },
   },
   methods: {
     over() {
@@ -48,8 +51,11 @@ export default {
     },
     deleteReview() {
       axios({
-        method: 'get',
+        method: 'delete',
         url: `${API_URL}/movies/reviews/${this.review.id}/`,
+        headers: {
+          Authorization: `Token ${this.$store.state.token}`,
+        },
       })
         .then(() => {
           this.$store.dispatch('getReviews', this.$route.params.tmdb_id)
