@@ -7,8 +7,8 @@ from django.shortcuts import render
 
 from django.contrib.auth import get_user_model
 
-from .serializers import MovieListSerializer, MovieSerializer, MovieNameSerializer, GenreNameSerializer, ReviewSerializer
-from .models import Movie, Actor, Genre, Director, Review
+from .serializers import MovieListSerializer, MovieSerializer, MovieNameSerializer, GenreNameSerializer, ReviewSerializer, NowMovieSerializer
+from .models import Movie, Actor, Genre, Director, Review, NowMovie
 import requests
 from django.db.models import Q
 
@@ -22,8 +22,13 @@ def movie_detail(request, pk):
 def movie_recent(request, num):
     pass
 
-def review_list_recent(request, num):
-    pass
+@api_view(['GET'])
+def review_list_recent(request):
+    recent_reviews = Review.objects.all().order_by('created_at')[0:5]
+
+    serializer = ReviewSerializer(recent_reviews, many=True)
+    print(type(serializer.data))
+    return Response(serializer.data)
 
 def review_list_user(request):
     pass
@@ -32,14 +37,10 @@ def review_list_user(request):
 def review_list_movie(request, movie_pk):
     movie=Movie.objects.get(id=movie_pk)
     if request.method == 'GET':
-        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '1')
         other_reviews = list(Review.objects.filter(Q(movie=movie) & ~Q(user=request.user)).order_by('created_at'))
-        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '2')
         my_review = list(Review.objects.filter(movie=movie, user=request.user))
         # print(request.user.name, request.user.id)
-        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '3')
         reviews = my_review + other_reviews
-        print('>>>>>>>>>>,>>>>>>>>>>>>>>>>>>>>>>', '4')
         serializer = ReviewSerializer(reviews, many=True)
 
         is_voted = False
@@ -67,6 +68,34 @@ def delete_review(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
+
+
+def fill_movie_show(request):
+    
+    url = f'https://api.themoviedb.org/3/movie/now_playing?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO&page=1&region=KR'
+    response = requests.get(url)
+    show_dict = response.json()
+
+    
+    now_show = NowMovie.objects.all()
+    for movie in now_show:
+        movie.delete()
+    
+    for movie in show_dict.get("results"):
+        NowMovie.objects.create(id = movie['id'], title= movie["title"], vote_average = movie["vote_average"], poster_path = movie["poster_path"])
+   
+
+
+@api_view(['GET'])
+def movie_show(request):
+ 
+    now_show = NowMovie.objects.all()
+    serializer = NowMovieSerializer(now_show, many=True)
+    return Response(serializer.data)
+    
+    
+
+    
 # def fill_data(request):
 #     # genres
 #     url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO'

@@ -1,15 +1,15 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import axios from 'axios'
-import router from '@/router'
+import Vue from "vue"
+import Vuex from "vuex"
+import axios from "axios"
+import router from "@/router"
 
-import createPersistedState from 'vuex-persistedstate'
+import createPersistedState from "vuex-persistedstate"
 
 Vue.use(Vuex)
 
 // dj-rest-auth docs
 // https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html
-const API_URL = 'http://127.0.0.1:8000'
+const API_URL = "http://127.0.0.1:8000"
 
 export default new Vuex.Store({
   plugins: [createPersistedState()],
@@ -20,6 +20,7 @@ export default new Vuex.Store({
     movie: null,
     token: null,
     user: null,
+    recentreviews: [],
     // isVoted: false,
   },
   getters: {
@@ -37,10 +38,13 @@ export default new Vuex.Store({
     GET_REVIEWS(state, reviews) {
       state.reviews = reviews
     },
+    GET_RECENT_REVIEWS(state, recentreviews) {
+      state.recentreviews = recentreviews
+    },
     // 회원가입 && 로그인
     SAVE_TOKEN(state, token) {
       state.token = token
-      router.push({ name: 'index' })
+      router.push({ name: "index" })
     },
     GET_USER_INFO(state, userInfo) {
       state.user = userInfo
@@ -53,7 +57,7 @@ export default new Vuex.Store({
   actions: {
     getPosts(context) {
       axios({
-        method: 'get',
+        method: "get",
         url: `${API_URL}/community/posts/`,
         // headers: {
         //   Authorization: `Token ${context.state.token}`
@@ -62,7 +66,7 @@ export default new Vuex.Store({
         .then((res) => {
           // console.log(res, context)
           console.log(res.data)
-          context.commit('GET_POSTS', res.data)
+          context.commit("GET_POSTS", res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -70,7 +74,7 @@ export default new Vuex.Store({
     },
     signUp(context, payload) {
       axios({
-        method: 'post',
+        method: "post",
         url: `${API_URL}/accounts/signup/`,
         data: {
           username: payload.username,
@@ -79,8 +83,8 @@ export default new Vuex.Store({
         },
       })
         .then((res) => {
-          context.commit('SAVE_TOKEN', res.data.key)
-          context.dispatch('getUserInfo')
+          context.commit("SAVE_TOKEN", res.data.key)
+          context.dispatch("getUserInfo")
         })
         .catch((err) => {
           console.log(err)
@@ -88,7 +92,7 @@ export default new Vuex.Store({
     },
     logIn(context, payload) {
       axios({
-        method: 'post',
+        method: "post",
         url: `${API_URL}/accounts/login/`,
         data: {
           username: payload.username,
@@ -97,8 +101,8 @@ export default new Vuex.Store({
       })
         .then((res) => {
           // console.log(res)
-          context.commit('SAVE_TOKEN', res.data.key)
-          context.dispatch('getUserInfo')
+          context.commit("SAVE_TOKEN", res.data.key)
+          context.dispatch("getUserInfo")
         })
         .catch((err) => {
           console.log(err)
@@ -106,14 +110,30 @@ export default new Vuex.Store({
     },
     getReviews(context, movie_id) {
       axios({
-        method: 'get',
+        method: "get",
         url: `${API_URL}/movies/reviews/movie/${movie_id}/`,
         headers: {
           Authorization: `Token ${context.state.token}`,
         },
       })
         .then((res) => {
-          context.commit('GET_REVIEWS', res.data.reviews)
+          context.commit("GET_REVIEWS", res.data.reviews)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    getRecentReviews(context) {
+      axios({
+        method: "get",
+        url: `${API_URL}/movies/reviews/recent/`,
+        headers: {
+          Authorization: `Token ${context.state.token}`,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          context.commit("GET_RECENT_REVIEWS", res.data)
         })
         .catch((err) => {
           console.log(err)
@@ -121,7 +141,7 @@ export default new Vuex.Store({
     },
     getUserInfo(context) {
       axios({
-        method: 'get',
+        method: "get",
         url: `${API_URL}/accounts/user/`,
         headers: {
           Authorization: `Token ${context.state.token}`,
@@ -135,7 +155,7 @@ export default new Vuex.Store({
             firstName: res.data.first_name,
             lastName: res.data.last_name,
           }
-          context.commit('GET_USER_INFO', userInfo)
+          context.commit("GET_USER_INFO", userInfo)
         })
         .catch((err) => {
           console.log(err)

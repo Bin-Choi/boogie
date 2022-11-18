@@ -32,10 +32,18 @@ class Movie(models.Model):
     directors = models.ManyToManyField(Director, related_name = "movies")
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name = "like_movies")
 
+
 class Review(models.Model):
     movie = models.ForeignKey(Movie, on_delete = models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete = models.CASCADE)
     content = models.TextField(blank=True)
     vote = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
+    
+
+class NowMovie(models.Model):
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=128)
+    vote_average = models.FloatField()
+    poster_path = models.CharField(max_length=200, blank=True)
 
