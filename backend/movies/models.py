@@ -4,21 +4,21 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 class Director(models.Model):
-    tmdb_id = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length= 30)
     profile_path = models.CharField(max_length=200, blank=True)
 
 class Actor(models.Model):
-    tmdb_id = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length = 30)
     profile_path = models.CharField(max_length=200, blank=True)
 
 class Genre(models.Model):
-    tmdb_id = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length = 30)
 
 class Movie(models.Model):
-    tmdb_id = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=128)
     release_date = models.DateField()
     country = models.CharField(max_length=30)

@@ -6,10 +6,10 @@
 </template>
 
 <script>
-import RecoMovieListItem from "../components/RecoMovieListItem.vue"
+import RecoMovieListItem from '@/components/RecoMovieListItem.vue'
 
 export default {
-  name: "RecoMovieList",
+  name: 'RecoMovieList',
   components: {
     RecoMovieListItem,
   },

@@ -1,17 +1,17 @@
 from rest_framework import serializers
 from .models import Movie, Actor, Director, Review, Genre
 
-class ActorNameSerializer(serializers.ModelSerializer):
+class ActorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Actor
-        fields = ('name',)
+        fields = '__all__'
 
-class DirectorNameSerializer(serializers.ModelSerializer):
+class DirectorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Director
-        fields = ('name',)
+        fields = '__all__'
 
 class GenreNameSerializer(serializers.ModelSerializer):
 
@@ -29,11 +29,11 @@ class MovieNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = 'title'
+        fields = ('title')
 
 class MovieSerializer(serializers.ModelSerializer):
-    actors = ActorNameSerializer(many=True, read_only=True)
-    directors = DirectorNameSerializer(many=True, read_only=True)
+    actors = ActorSerializer(many=True, read_only=True)
+    directors = DirectorSerializer(many=True, read_only=True)
     genres = GenreNameSerializer(many=True, read_only=True)
     like_users_count = serializers.IntegerField(source='like_users.count', read_only=True)
     
@@ -42,13 +42,10 @@ class MovieSerializer(serializers.ModelSerializer):
         exclude = ('like_users',)
 
 class ReviewSerializer(serializers.ModelSerializer):
-    movie = MovieNameSerializer(many=True, read_only=True)
+    movie_title = serializers.CharField(source='movie.title', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
 
     class Meta:
         model = Review
         fields = '__all__'
-        read_only_fields = ('movie', 'username')
-
-
-
+        read_only_fields = ('movie', 'user')
