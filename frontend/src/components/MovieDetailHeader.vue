@@ -2,13 +2,21 @@
   <div id="movie_detail_header">
     <div
       class="d-flex justify-content-center mx-auto"
-      style="max-width: 2000px"
-    >
+      style="max-width: 2000px">
       <div id="movie_detail_header_poster" class="col-2">
         <img :src="poster_url" />
       </div>
       <div id="movie_detail_header_info" class="col-6 ps-4 pt-4 text-start">
-        <h2 class="fw-bolder">{{ movie.title }}</h2>
+        <div>
+          <h2 class="fw-bolder">{{ movie.title }}</h2>
+          <div @click="likeMovie">
+            <img
+              :src="movie.isLiked ? heartPinkPath : heartGrayPath"
+              style="width: 50px" />
+            {{ movie.like_users_count }}
+          </div>
+        </div>
+
         <p class="fs-6" style="color: gray">
           {{ movie.release_date }} · {{ genres }} · {{ movie?.country }}
         </p>
@@ -28,12 +36,27 @@
 <script>
 import ReviewForm from '@/components/ReviewForm.vue'
 
+import axios from 'axios'
+const API_URL = 'http://127.0.0.1:8000'
+
 export default {
   name: 'MovieDetailHeader',
   components: {
     ReviewForm,
   },
+  data() {
+    return {
+      heartPinkPath: require('@/assets/heart_pink.png'),
+      heartGrayPath: require('@/assets/heart_gray.png'),
+    }
+  },
   computed: {
+    user() {
+      return this.$store.state.user
+    },
+    isLogin() {
+      return this.$store.getters.isLogin
+    },
     movie() {
       return this.$store.state.movie
     },
@@ -50,6 +73,34 @@ export default {
         genres += genre.name + ' '
       })
       return genres
+    },
+  },
+  methods: {
+    likeMovie() {
+      if (!this.isLogin) {
+        alert('로그인이 필요합니다')
+        return
+      }
+      axios({
+        method: 'post',
+        url: `${API_URL}/movies/${this.movie.id}/like/`,
+        headers: {
+          Authorization: `Token ${this.$store.state.token}`,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          const isLiked = res.data.is_liked
+          this.movie.isLiked = isLiked
+          if (isLiked) {
+            this.movie.like_users_count += 1
+          } else {
+            this.movie.like_users_count -= 1
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
   },
 }

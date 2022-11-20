@@ -11,15 +11,14 @@ Vue.use(Vuex)
 // https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html
 const API_URL = 'http://127.0.0.1:8000'
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   plugins: [createPersistedState()],
 
   state: {
-    posts: [],
-    reviews: [],
-    movie: null,
     token: null,
     user: null,
+    posts: [],
+    movie: null,
     // isVoted: false,
   },
   getters: {
@@ -28,15 +27,6 @@ export default new Vuex.Store({
     },
   },
   mutations: {
-    GET_POSTS(state, posts) {
-      state.posts = posts
-    },
-    GET_MOVIE(state, movie) {
-      state.movie = movie
-    },
-    GET_REVIEWS(state, reviews) {
-      state.reviews = reviews
-    },
     // 회원가입 && 로그인
     SAVE_TOKEN(state, token) {
       state.token = token
@@ -49,25 +39,15 @@ export default new Vuex.Store({
       state.token = null
       state.user = null
     },
+    // 그 외
+    GET_POSTS(state, posts) {
+      state.posts = posts
+    },
+    GET_MOVIE(state, movie) {
+      state.movie = movie
+    },
   },
   actions: {
-    getPosts(context) {
-      axios({
-        method: 'get',
-        url: `${API_URL}/community/posts/`,
-        // headers: {
-        //   Authorization: `Token ${context.state.token}`
-        // }
-      })
-        .then((res) => {
-          // console.log(res, context)
-          console.log(res.data)
-          context.commit('GET_POSTS', res.data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
     signUp(context, payload) {
       axios({
         method: 'post',
@@ -96,7 +76,7 @@ export default new Vuex.Store({
         },
       })
         .then((res) => {
-          // console.log(res)
+          console.log(res)
           context.commit('SAVE_TOKEN', res.data.key)
           context.dispatch('getUserInfo')
         })
@@ -104,16 +84,17 @@ export default new Vuex.Store({
           console.log(err)
         })
     },
-    getReviews(context, movie_id) {
+    logOut(context) {
       axios({
-        method: 'get',
-        url: `${API_URL}/movies/reviews/movie/${movie_id}/`,
+        method: 'post',
+        url: `${API_URL}/accounts/logout/`,
         headers: {
           Authorization: `Token ${context.state.token}`,
         },
       })
-        .then((res) => {
-          context.commit('GET_REVIEWS', res.data.reviews)
+        .then(() => {
+          // console.log(res)
+          context.commit('LOG_OUT')
         })
         .catch((err) => {
           console.log(err)
@@ -141,5 +122,39 @@ export default new Vuex.Store({
           console.log(err)
         })
     },
+    getPosts(context) {
+      axios({
+        method: 'get',
+        url: `${API_URL}/community/posts/`,
+      })
+        .then((res) => {
+          context.commit('GET_POSTS', res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    getMovie(context, movieId) {
+      axios({
+        method: 'get',
+        url: `${API_URL}/movies/${movieId}/`,
+      })
+        .then((res) => {
+          console.log(res)
+          const movie = res.data
+          if (movie.like_users.includes(context.state.user?.id)) {
+            movie.isLiked = true
+          } else {
+            movie.isLiked = false
+          }
+          context.commit('GET_MOVIE', movie)
+        })
+        .catch((err) => {
+          router.push({ name: 'NotFound404' })
+          console.log(err)
+        })
+    },
   },
 })
+
+export default store

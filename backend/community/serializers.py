@@ -8,7 +8,6 @@ class PostListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'title', 'username', 'like_users_count')
-        # fields = '__all__'
 
 class PostSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
@@ -16,8 +15,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        exclude =  ['like_users',]
-        read_only_fields = ('user',)
+        fields = '__all__'
+        read_only_fields = ('user', 'like_users', )
 
 class CommentSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
@@ -26,3 +25,11 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
         read_only_fields = ('post', 'user', 'original_comment', )
+
+class CommentPostSerializer(serializers.ModelSerializer):
+    post = PostListSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ('post', )
+
