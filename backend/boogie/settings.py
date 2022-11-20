@@ -35,6 +35,9 @@ INSTALLED_APPS = [
     'community',
     'movies',
 
+    #crontab
+    'django_crontab',
+
     'rest_framework',
     # Auth
     'rest_framework.authtoken',
@@ -58,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
 SITE_ID = 1
 
 REST_FRAMEWORK = {
@@ -97,7 +101,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
+#CRONTAB AWS 올리고 작업
+CRONJOBS = [
+    ('* 0 * * *', 'movies.views.fill_movie_now_every_day', '>> schedule.log'),
+    ('* 1 * * 1', 'movies.views.ill_boxoffice_every_week', '>> schedule.log')
+]
 
 # CORS_ALLOW_ORIGINS = []
 CORS_ALLOW_ALL_ORIGINS = True

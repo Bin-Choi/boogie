@@ -25,8 +25,17 @@ export default {
       content: null,
     }
   },
+  computed: {
+    isLogin() {
+      return this.$store.getters.isLogin
+    },
+  },
   methods: {
     createComment() {
+      if (!this.isLogin) {
+        alert('로그인을 해주세요')
+        return
+      }
       const content = this.content
       if (!content) {
         alert('내용을 입력해주세요')
@@ -34,13 +43,13 @@ export default {
       }
       axios({
         method: 'post',
-        url: `${API_URL}/community/comments/post/${this.$route.params.post_pk}/`,
+        url: `${API_URL}/community/posts/${this.$route.params.postId}/comments/`,
         data: {
           content: content,
         },
-        //   headers: {
-        //     Authorization: `Token ${this.$store.state.token}`
-        //   }
+        headers: {
+          Authorization: `Token ${this.$store.state.token}`,
+        },
       })
         .then((res) => {
           console.log(res)

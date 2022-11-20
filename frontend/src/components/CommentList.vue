@@ -3,10 +3,12 @@
     <h3>comment List</h3>
     <hr />
     <CommentListItem
-      v-for="comment in comments"
-      :key="comment.id"
-      :comment="comment"
+      v-for="comments in orderedComments"
+      :key="comments[0].id"
+      :comments="comments"
+      :selectedComment="selectedComment"
       @get_comments="getComments"
+      @select_comment="selectComment"
       class="text-start" />
     <CommentForm @get_comments="getComments" />
   </div>
@@ -24,7 +26,8 @@ export default {
   name: 'CommentList',
   data() {
     return {
-      comments: null,
+      orderedComments: null,
+      selectedComment: null,
     }
   },
   created() {
@@ -34,17 +37,33 @@ export default {
     getComments() {
       axios({
         method: 'get',
-        url: `${API_URL}/community/comments/post/${this.$route.params.post_pk}/`,
-        // headers: {
-        //   Authorization: `Token ${context.state.token}`
-        // }
+        url: `${API_URL}/community/posts/${this.$route.params.postId}/comments/`,
       })
         .then((res) => {
-          this.comments = res.data
+          const comments = res.data
+          // 댓글 정렬
+          let i = 0
+          let commentsRef = {}
+          let orderedComments = []
+          comments.forEach((comment) => {
+            if (comment.original_comment === null) {
+              commentsRef[comment.id] = i
+              orderedComments.push([comment])
+              i += 1
+            } else {
+              orderedComments[commentsRef[comment.original_comment]].push(
+                comment
+              )
+            }
+          })
+          this.orderedComments = orderedComments
         })
         .catch((err) => {
           console.log(err)
         })
+    },
+    selectComment(commentId) {
+      this.selectedComment = commentId
     },
   },
 }

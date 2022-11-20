@@ -24,9 +24,6 @@ import RecoMovieList from '@/components/RecoMovieList.vue'
 import ReviewList from '@/components/ReviewList.vue'
 import VideoList from '@/components/VideoList.vue'
 
-import axios from 'axios'
-const LOCAL_URL = 'http://127.0.0.1:8000/'
-
 export default {
   name: 'DetailView',
   components: {
@@ -49,19 +46,16 @@ export default {
     },
   },
   created() {
-    this.getMovie()
+    this.getMovie(this.$route.params.movieId)
   },
   methods: {
-    getMovie() {
-      axios({
-        url: LOCAL_URL + `movies/detail/${this.$route.params.tmdb_id}/`,
-        method: 'get',
-      })
-        .then((response) => {
-          this.$store.commit('GET_MOVIE', response.data)
-        })
-        .catch((error) => console.log(error))
+    getMovie(movieId) {
+      this.$store.dispatch('getMovie', movieId)
     },
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.getMovie(to.params.movieId)
+    next()
   },
 }
 </script>

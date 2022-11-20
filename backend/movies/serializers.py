@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie, Actor, Director, Review, Genre
+from .models import Movie, Actor, Director, Review, Genre, NowMovie, BoxOffice
 
 class ActorSerializer(serializers.ModelSerializer):
 
@@ -23,13 +23,7 @@ class MovieListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = ('title', 'id', 'poster_path', 'vote_average',)
-
-class MovieNameSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Movie
-        fields = ('title')
+        fields = ('id', 'title', 'poster_path', 'vote_average',)
 
 class MovieSerializer(serializers.ModelSerializer):
     actors = ActorSerializer(many=True, read_only=True)
@@ -39,7 +33,7 @@ class MovieSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Movie
-        exclude = ('like_users',)
+        fields = '__all__'
 
 class ReviewSerializer(serializers.ModelSerializer):
     movie_title = serializers.CharField(source='movie.title', read_only=True)
@@ -49,3 +43,31 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
         read_only_fields = ('movie', 'user')
+
+class NowMovieSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = NowMovie
+        fields = '__all__'
+        
+
+class BoxOfficeSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = BoxOffice
+        fields = '__all__'
+
+# For accounts/views.py
+class GenreIdSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name',)
+
+class MovieGenreSerializer(serializers.ModelSerializer):
+    
+    genres = GenreIdSerializer(many=True, read_only=True)    
+    
+    class Meta:
+        model = Movie
+        fields = ('genres', )
