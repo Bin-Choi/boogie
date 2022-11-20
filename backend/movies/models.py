@@ -47,3 +47,9 @@ class NowMovie(models.Model):
     vote_average = models.FloatField()
     poster_path = models.CharField(max_length=200, blank=True)
 
+class BoxOffice(models.Model):
+    title = models.CharField(max_length=128)
+    audi_cnt = models.IntegerField()
+    day = models.IntegerField()
+    
+

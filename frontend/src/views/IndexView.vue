@@ -10,15 +10,19 @@
     <div>
       <NowMovieList />
     </div>
+    <div>
+      <BoxOffice />
+    </div>
   </div>
 </template>
 
 <script>
 import RecentReviewList from "../components/RecentReviewList.vue"
 import NowMovieList from "../components/NowMovieList.vue"
+import BoxOffice from "../components/BoxOffice.vue"
 
 export default {
   name: "IndexView",
-  components: { RecentReviewList, NowMovieList },
+  components: { RecentReviewList, NowMovieList, BoxOffice },
 }
 </script>

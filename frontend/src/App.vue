@@ -1,41 +1,55 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link :to="{ name: 'index' }">Index</router-link> |
-      <router-link :to="{ name: 'detail', params: { tmdb_id: 129 } }"
-        >Detail</router-link
-      >| <router-link :to="{ name: 'community' }">자유게시판</router-link> |
-      <router-link :to="{ name: 'signup' }">회원가입</router-link> |
-      <router-link :to="{ name: 'login' }">로그인</router-link> |
-      <router-link :to="{ name: 'index' }" @click="$store.commit('LOG_OUT')"
-        >로그아웃</router-link
+  <v-app>
+    <v-app-bar
+      app
+      color="primary"
+      dark
+    >
+      <div class="d-flex align-center">
+        <v-img
+          alt="Vuetify Logo"
+          class="shrink mr-2"
+          contain
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          transition="scale-transition"
+          width="40"
+        />
+
+        <v-img
+          alt="Vuetify Name"
+          class="shrink mt-1 hidden-sm-and-down"
+          contain
+          min-width="100"
+          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
+          width="100"
+        />
+      </div>
+
+      <v-spacer></v-spacer>
+
+      <v-btn
+        href="https://github.com/vuetifyjs/vuetify/releases/latest"
+        target="_blank"
+        text
       >
-    </nav>
-    <router-view />
-  </div>
+        <span class="mr-2">Latest Release</span>
+        <v-icon>mdi-open-in-new</v-icon>
+      </v-btn>
+    </v-app-bar>
+
+    <v-main>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  background-color: #f9f4f4;
-}
+<script>
 
-nav {
-  background-color: #56357b;
-  padding: 15px;
-}
+export default {
+  name: 'App',
 
-nav a {
-  font-weight: bold;
-  color: #b9a0d4;
-}
-
-nav a.router-link-exact-active {
-  color: #ffffff;
-}
-</style>
+  data: () => ({
+    //
+  }),
+};
+</script>

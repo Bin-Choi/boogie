@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'dj_rest_auth',
 
+    # scheduling
+    'django_crontab',
+    
     
     # registration
     'django.contrib.sites',
@@ -97,7 +100,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
+#CRONTAB
+CRONJOBS = [
+    ('* 0 * * *', 'cron.fill_data_everyday', '>> schedule.log')
+]
 
 # CORS_ALLOW_ORIGINS = []
 CORS_ALLOW_ALL_ORIGINS = True

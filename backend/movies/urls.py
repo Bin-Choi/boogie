@@ -10,5 +10,7 @@ urlpatterns = [
     path('reviews/<int:pk>/', views.delete_review),
     path('reviews/', views.review_list_recent),
     path('show/', views.movie_show),
+    path('boxoffice/', views.boxoffice),
+    # path('fill/', views.fill_boxoffice)
     # path('fill/data/', views.fill_data),
 ]

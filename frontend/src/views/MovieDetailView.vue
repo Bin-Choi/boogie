@@ -18,17 +18,17 @@
 </template>
 
 <script>
-import MovieDetailHeader from '@/components/MovieDetailHeader.vue'
-import MovieDetailInfo from '@/components/MovieDetailInfo.vue'
-import RecoMovieList from '@/components/RecoMovieList.vue'
-import ReviewList from '@/components/ReviewList.vue'
-import VideoList from '@/components/VideoList.vue'
+import MovieDetailHeader from "@/components/MovieDetailHeader.vue"
+import MovieDetailInfo from "@/components/MovieDetailInfo.vue"
+import RecoMovieList from "@/components/RecoMovieList.vue"
+import ReviewList from "@/components/ReviewList.vue"
+import VideoList from "@/components/VideoList.vue"
 
-import axios from 'axios'
-const LOCAL_URL = 'http://127.0.0.1:8000/'
+import axios from "axios"
+const LOCAL_URL = "http://127.0.0.1:8000/"
 
 export default {
-  name: 'DetailView',
+  name: "DetailView",
   components: {
     MovieDetailHeader,
     MovieDetailInfo,
@@ -44,7 +44,7 @@ export default {
       if (this.movie?.backdrop_path) {
         return `https://image.tmdb.org/t/p/original${this.movie.backdrop_path}`
       } else {
-        return require('@/assets/movie_default_backdrop.png')
+        return require("@/assets/movie_default_backdrop.png")
       }
     },
   },
@@ -55,10 +55,10 @@ export default {
     getMovie() {
       axios({
         url: LOCAL_URL + `movies/detail/${this.$route.params.tmdb_id}/`,
-        method: 'get',
+        method: "get",
       })
         .then((response) => {
-          this.$store.commit('GET_MOVIE', response.data)
+          this.$store.commit("GET_MOVIE", response.data)
         })
         .catch((error) => console.log(error))
     },
