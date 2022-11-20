@@ -10,9 +10,10 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-from .serializers import MovieListSerializer, MovieSerializer, ReviewSerializer
-from .models import Movie, Actor, Genre, Director, Review
+from .serializers import MovieListSerializer, MovieSerializer, ReviewSerializer, NowMovieSerializer, BoxOfficeSerializer
+from .models import Movie, Actor, Genre, Director, Review, NowMovie, BoxOffice
 import requests
+from datetime import datetime ,timedelta
 
 # Create your views here.
 @api_view(['GET'])
@@ -88,6 +89,47 @@ def review_detail(request, review_pk):
         #         serializer.save()
         #         return Response(serializer.data)
         return Response(status=status.HTTP_403_FORBIDDEN)
+
+@api_view(['GET'])
+def review_list_recent(request):
+    recent_reviews = Review.objects.all().order_by('created_at')[:5]
+
+    serializer = ReviewSerializer(recent_reviews, many=True)
+    print(type(serializer.data))
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def movie_list_now(request):
+    now_show = NowMovie.objects.all()
+    serializer = NowMovieSerializer(now_show, many=True)
+    return Response(serializer.data)
+     
+@api_view(['GET'])     
+def boxoffice(request):
+    box_office = BoxOffice.objects.all().order_by('day')
+    serializer = BoxOfficeSerializer(box_office, many=True)
+    
+    # 상위 5개 영화 제목 추출
+    top5_title = []
+    for topmovie in serializer.data[:5]:
+        top5_title.append(topmovie['title'])
+    
+    # 데이터 가공
+    data = {}
+    for movie in serializer.data[5:]:
+        if movie['title'] in top5_title:
+            if not data.get(movie['title']):
+                data[movie['title']] = [None, None, None, None, None, None, None]
+                data[movie['title']][movie['day']] = movie['audi_cnt'] 
+                continue
+            data[movie['title']][movie['day']] = movie['audi_cnt'] 
+    
+    # chart.js 라이브러리에 맞게 가공
+    chart_data = []
+    for title in data:
+        chart_data.append({"label":title, "data":data[title] })
+    
+    return Response(chart_data)
 
 ######################################################3
 
@@ -188,6 +230,50 @@ def save_movie(id):
 
         m.directors.add(d)
 
+def fill_movie_now_every_day():
+    fill_movie_now()
+
+def fill_movie_now():
+    url = f'https://api.themoviedb.org/3/movie/now_playing?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO&page=1&region=KR'
+    response = requests.get(url)
+    show_dict = response.json()
+
+    now_show = NowMovie.objects.all()
+    for movie in now_show:
+        movie.delete()
+    
+    for movie in show_dict.get("results")[:10]:
+        NowMovie.objects.create(id = movie['id'], title= movie["title"], vote_average = movie["vote_average"], poster_path = movie["poster_path"])
+   
+def fill_boxoffice_every_week():
+    fill_boxoffice()
+
+def fill_boxoffice():
+    
+    movies = BoxOffice.objects.all()
+    for movie in movies:
+        movie.delete()
+    
+    # 주간 박스오피스 요청 보내서 5개를 영화제목, 관객수, day=-1로 저장
+    date = (datetime.now()-timedelta(days=7)).strftime('%Y%m%d')
+    url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key=128fedfc5557dcb90bba94cf5beff443&targetDt={date}&weekGb=0&itemPerPage=5'
+    response = requests.get(url)
+    boxoffice_dict = response.json()
+            
+    for movie in boxoffice_dict['boxOfficeResult']['weeklyBoxOfficeList']:
+        BoxOffice.objects.create(title= movie['movieNm'], audi_cnt = movie['audiCnt'], day=-1)
+    
+    # 7일간의 일별 박스오피스
+    for day_dif in range(7, 0, -1):
+        date = (datetime.now()-timedelta(days=day_dif)).strftime('%Y%m%d')
+        
+        url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=128fedfc5557dcb90bba94cf5beff443&targetDt={date}&itemPerPage=10'
+        response = requests.get(url)
+        boxoffice_dict = response.json()
+            
+        for movie in boxoffice_dict['boxOfficeResult']['dailyBoxOfficeList']:
+            BoxOffice.objects.create(title= movie['movieNm'], audi_cnt = movie['audiCnt'], day=7-day_dif)
+     
 
 # def fill_data(request):
 #     # genres

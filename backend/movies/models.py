@@ -39,3 +39,14 @@ class Review(models.Model):
     vote = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
     created_at = models.DateTimeField(auto_now_add=True)
 
+class NowMovie(models.Model):
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=128)
+    vote_average = models.FloatField()
+    poster_path = models.CharField(max_length=200, blank=True)
+
+class BoxOffice(models.Model):
+    title = models.CharField(max_length=128)
+    audi_cnt = models.IntegerField()
+    day = models.IntegerField()
+    

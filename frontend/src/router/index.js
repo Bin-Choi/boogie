@@ -7,8 +7,6 @@ import CommunityView from '@/views/CommunityView.vue'
 import PostDetailView from '@/views/PostDetailView.vue'
 import PostCreateView from '@/views/PostCreateView.vue'
 import PostUpdateView from '@/views/PostUpdateView.vue'
-import SignUpView from '@/views/SignUpView.vue'
-import LoginView from '@/views/LoginView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import SearchView from '@/views/SearchView.vue'
 import NotFound404 from '@/views/NotFound404.vue'
@@ -54,16 +52,6 @@ const routes = [
         next({ name: 'login' })
       }
     },
-  },
-  {
-    path: '/signup',
-    name: 'signup',
-    component: SignUpView,
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginView,
   },
   {
     path: '/profile/:username',

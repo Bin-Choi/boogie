@@ -1,14 +1,28 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
+  <div>
+    <div class="home">
+      <img alt="Vue logo" src="../assets/logo.png" />
+    </div>
+    <hr />
+    <div>
+      <RecentReviewList />
+    </div>
+    <div>
+      <NowMovieList />
+    </div>
+    <div>
+      <BoxOffice />
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
+import RecentReviewList from '@/components/RecentReviewList.vue'
+import NowMovieList from '@/components/NowMovieList.vue'
+import BoxOffice from '@/components/BoxOffice.vue'
 
 export default {
-  name: "IndexView",
-  components: {},
+  name: 'IndexView',
+  components: { RecentReviewList, NowMovieList, BoxOffice },
 }
 </script>

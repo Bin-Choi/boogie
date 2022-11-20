@@ -21,7 +21,13 @@
 
           <div class="modal-footer">
             <slot name="footer">
-              <button class="modal-default-button" @click="$emit('close')">
+              <button
+                class="modal-default-button"
+                @click="
+                  username = null
+                  password = null
+                  $emit('close')
+                ">
                 닫기
               </button>
             </slot>
@@ -54,6 +60,8 @@ export default {
         password: password,
       }
       this.$store.dispatch('logIn', payload)
+      this.username = null
+      this.password = null
       this.$emit('close')
     },
   },

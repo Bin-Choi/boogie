@@ -9,27 +9,29 @@
 
           <div class="modal-body">
             <slot name="body">
-              <form @submit.prevent="SignUp">
-                <label for="username">username : </label>
-                <input type="text" id="username" v-model="username" /><br />
+              <label for="username">username : </label>
+              <input type="text" id="username" v-model="username" /><br />
 
-                <label for="password1">password : </label>
-                <input
-                  type="paswsword"
-                  id="password1"
-                  v-model="password1" /><br />
+              <label for="password"> password : </label>
+              <input type="password" id="password1" v-model="password1" /><br />
 
-                <label for="password2">password confirmation : </label>
-                <input type="password" id="password2" v-model="password2" />
+              <label for="password"> password 확인: </label>
+              <input type="password" id="password2" v-model="password2" /><br />
 
-                <input type="submit" value="SignUp" />
-              </form>
+              <input type="submit" value="회원가입" @click="signUp" />
             </slot>
           </div>
 
           <div class="modal-footer">
             <slot name="footer">
-              <button class="modal-default-button" @click="$emit('close')">
+              <button
+                class="modal-default-button"
+                @click="
+                  username = null
+                  password1 = null
+                  password2 = null
+                  $emit('close')
+                ">
                 닫기
               </button>
             </slot>
@@ -54,7 +56,7 @@ export default {
     }
   },
   methods: {
-    SignUp() {
+    signUp() {
       const username = this.username
       const password1 = this.password1
       const password2 = this.password2
@@ -65,6 +67,8 @@ export default {
         password2,
       }
       this.$store.dispatch('signUp', payload)
+      this.password1 = null
+      this.password2 = null
       this.$emit('close')
     },
   },
