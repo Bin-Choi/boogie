@@ -2,7 +2,8 @@
   <div
     class="d-flex justify-content-between mt-3"
     @click="toMovieDetail"
-    style="cursor: pointer">
+    style="cursor: pointer"
+  >
     <div>
       <span>{{ review.movie_title }}</span>
       <img :src="starsPath" style="width: 150px" />
@@ -16,7 +17,7 @@
 
 <script>
 export default {
-  name: 'ProfileReviewListItem',
+  name: 'RecentReviewListItem',
   props: {
     review: Object,
   },

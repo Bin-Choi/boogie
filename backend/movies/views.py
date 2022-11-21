@@ -132,6 +132,21 @@ def boxoffice(request):
         chart_data.append({"label":title, "data":data[title]})
     
     return Response(chart_data)
+#######################################################
+
+
+@api_view(['GET'])
+def search_naver(request, query):
+
+    url = f'https://openapi.naver.com/v1/search/blog.json?query={query}'
+    headers = {
+    'Accept': 'application/json',
+    'X-Naver-Client-Id': 'NNHX_cQDFZBEfGfHAKSj',
+    'X-Naver-Client-Secret': 'IFlMhWdiIZ'
+    }
+    response = requests.get(url, headers= headers)
+    return Response(response.json())
+
 
 
 ######################################################3

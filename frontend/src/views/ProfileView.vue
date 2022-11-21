@@ -13,35 +13,47 @@
           btn: true,
           'btn-outline-primary': !isFollowed,
           'btn-outline-secondary': isFollowed,
-        }">
+        }"
+      >
         {{ isFollowed ? '팔로잉 취소' : '팔로우' }}
       </button>
     </div>
     <p>
-      선호장르{{
-        genrePreference[0][0] + genrePreference[1][0] + genrePreference[2][0]
-      }}
+      선호장르
+      <span v-if="genrePreference.length >= 1">{{
+        genrePreference[0][0]
+      }}</span>
+      <span v-if="genrePreference.length >= 2">{{
+        genrePreference[1][0]
+      }}</span>
+      <span v-if="genrePreference.length >= 3">{{
+        genrePreference[2][0]
+      }}</span>
     </p>
     <p>영화 &#10084;</p>
     <ProfileMovieListItem
       v-for="movie in person?.like_movies"
       :key="`movie-${movie.id}`"
-      :movie="movie" />
+      :movie="movie"
+    />
     <p>내 리뷰</p>
     <ProfileReviewListItem
       v-for="review in person?.my_reviews"
       :key="`review-${review.id}`"
-      :review="review" />
+      :review="review"
+    />
     <p>내가 작성한 글</p>
     <PostListItem
       v-for="post in person?.my_posts"
       :key="`my-${post.id}`"
-      :post="post" />
+      :post="post"
+    />
     <p>글 &#128077;</p>
     <PostListItem
       v-for="post in person?.like_posts"
       :key="`like-${post.id}`"
-      :post="post" />
+      :post="post"
+    />
   </div>
 </template>
 
@@ -77,9 +89,13 @@ export default {
       return new Date(this.person?.date_joined).toLocaleDateString()
     },
     genrePreference() {
-      return Object.entries(this.person?.genre_preference).sort(
-        (a, b) => b[1] - a[1]
-      )
+      if (this.person?.genre_preference) {
+        return Object.entries(this.person?.genre_preference).sort(
+          (a, b) => b[1] - a[1]
+        )
+      } else {
+        return []
+      }
     },
   },
   created() {

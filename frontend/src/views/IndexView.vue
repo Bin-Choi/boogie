@@ -8,6 +8,9 @@
       <RecentReviewList />
     </div>
     <div>
+      <HotPostList />
+    </div>
+    <div>
       <NowMovieList />
     </div>
     <div>
@@ -20,9 +23,15 @@
 import RecentReviewList from '@/components/RecentReviewList.vue'
 import NowMovieList from '@/components/NowMovieList.vue'
 import BoxOffice from '@/components/BoxOffice.vue'
+import HotPostList from '@/components/HotPostList.vue'
 
 export default {
   name: 'IndexView',
-  components: { RecentReviewList, NowMovieList, BoxOffice },
+  components: {
+    RecentReviewList,
+    NowMovieList,
+    BoxOffice,
+    HotPostList,
+  },
 }
 </script>

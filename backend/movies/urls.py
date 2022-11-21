@@ -12,6 +12,8 @@ urlpatterns = [
     path('now/', views.movie_list_now),
     path('boxoffice/', views.boxoffice),
     path('recommend/', views.movie_recommend),
+    path('naver/<str:query>/', views.search_naver)
+
     # path('fill/now/', views.fill_movie_now),
     # path('fill/boxoffice/', views.fill_boxoffice),
     # path('fill/data/', views.fill_data),
