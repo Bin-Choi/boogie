@@ -15,8 +15,10 @@ export default {
   data() {
     return {
       datasets: null,
+      colors: ['#CC0000', '#3366FF', '#33CC33', '#FF6600', '#FFFF66'],
     }
   },
+  methods: {},
   mounted() {
     const ctx = document.getElementById('myChart')
 
@@ -25,7 +27,20 @@ export default {
       url: `${API}/movies/boxoffice/`,
     })
       .then((res) => {
-        this.datasets = res.data
+        const datasets = res.data
+        // for datasets:
+        // , "borderWidth":'3', "fill": 'false', "tension": "0.3"}
+        let i = 0
+
+        datasets.forEach((dataset) => {
+          dataset['borderWidth'] = 3
+          dataset['fill'] = false
+          dataset['tension'] = 0.3
+          dataset['borderColor'] = this.colors[i]
+          i += 1
+        })
+
+        this.datasets = datasets
 
         const myChart = new Chart(ctx, {
           type: 'line',
@@ -34,9 +49,24 @@ export default {
             datasets: this.datasets,
           },
           options: {
+            responsive: true,
+            title: {
+              display: true,
+              text: '주간 인기 영화',
+            },
+            tooltips: {
+              mode: 'index',
+              intersect: false,
+            },
+            hover: {
+              mode: 'nearest',
+              intersect: true,
+            },
             scales: {
               y: {
-                beginAtZero: true,
+                type: 'linear',
+                suggestedMin: 0,
+                suggestedMax: 1000000,
               },
             },
           },

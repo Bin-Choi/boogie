@@ -104,6 +104,7 @@ def movie_list_now(request):
     serializer = NowMovieSerializer(now_show, many=True)
     return Response(serializer.data)
      
+
 @api_view(['GET'])     
 def boxoffice(request):
     box_office = BoxOffice.objects.all().order_by('day')
@@ -127,9 +128,11 @@ def boxoffice(request):
     # chart.js 라이브러리에 맞게 가공
     chart_data = []
     for title in data:
-        chart_data.append({"label":title, "data":data[title] })
+
+        chart_data.append({"label":title, "data":data[title]})
     
     return Response(chart_data)
+
 
 ######################################################3
 
