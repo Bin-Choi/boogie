@@ -10,8 +10,29 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from django.contrib.auth import get_user_model
 from .serializers import PostSerializer, PostListSerializer, CommentSerializer
 from .models import Post, Comment
+from operator import itemgetter
+
+from django.db.models import Q
 
 # Create your views here.
+@api_view(['GET'])
+def post_list_hot(request):
+    hot_posts = Post.objects.all()
+    serializer = PostListSerializer(hot_posts, many=True)
+
+    data = sorted(serializer.data, key=itemgetter('like_users_count'),reverse=True)
+
+    return Response(data)
+
+
+@api_view(['GET'])
+def search_post(request, query):
+    print(query)
+    posts = Post.objects.filter(Q(title__contains=query) | Q(content__contains=query))
+    serializer = PostListSerializer(posts, many=True)
+
+    return Response(serializer.data)
+
 @api_view(['GET', 'POST'])
 def post_list(request):
     if request.method == 'GET':
@@ -28,8 +49,6 @@ def post_list(request):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-def post_list_hot(request, num):
-    pass
 
 @api_view(['GET', 'DELETE', 'PUT'])
 @permission_classes([IsAuthenticated])
@@ -145,3 +164,4 @@ def comment_detail(request, post_pk, comment_pk):
 #     if serializer.is_valid(raise_exception=True):
 #         serializer.save(post=post)
 #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
