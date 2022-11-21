@@ -1,0 +1,170 @@
+[
+{
+    "model": "movies.director",
+    "pk": 24,
+    "fields": {
+        "name": "Robert Zemeckis",
+        "profile_path": "/lPYDQ5LYNJ12rJZENtyASmVZ1Ql.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 108,
+    "fields": {
+        "name": "Peter Jackson",
+        "profile_path": "/4hh7hips4xc6kgpNDQKQH3goRvJ.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 138,
+    "fields": {
+        "name": "Quentin Tarantino",
+        "profile_path": "/1gjcpAa99FAOWGnrUvHEXXsRs7o.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 488,
+    "fields": {
+        "name": "Steven Spielberg",
+        "profile_path": "/tZxcg19YQ3e8fJ0pOs7hjlnmmr6.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 525,
+    "fields": {
+        "name": "Christopher Nolan",
+        "profile_path": "/xuAIuYSmsUzKlUMBFGVZaWsY3DZ.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 608,
+    "fields": {
+        "name": "Hayao Miyazaki",
+        "profile_path": "/mG3cfxtA5jqDc7fpKgyzZMKoXDh.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 1032,
+    "fields": {
+        "name": "Martin Scorsese",
+        "profile_path": "/9U9Y5GQuWX3EZy39B8nkk4NY01S.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 1776,
+    "fields": {
+        "name": "Francis Ford Coppola",
+        "profile_path": "/mGKkVp3l9cipPt10AqoQnwaPrfI.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 2636,
+    "fields": {
+        "name": "Alfred Hitchcock",
+        "profile_path": "/108fiNM6poRieMg7RIqLJRxdAwG.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 4027,
+    "fields": {
+        "name": "Frank Darabont",
+        "profile_path": "/nvOqAQhKtXdHtczgqanoCfltsxJ.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 4385,
+    "fields": {
+        "name": "Sergio Leone",
+        "profile_path": "/2576qoW8l9Z1nKGM10ar60aIwUu.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 4818,
+    "fields": {
+        "name": "Roberto Benigni",
+        "profile_path": "/noelOhwX1oaNSvU9NLKhPrHTFI3.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 21684,
+    "fields": {
+        "name": "Bong Joon-ho",
+        "profile_path": "/tKLJBqbdH6HFj2QxLA5o8Zk7IVs.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 59521,
+    "fields": {
+        "name": "Jaume Collet-Serra",
+        "profile_path": "/saAeTFfgt9YRAybXmzfmIz01UCB.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 65314,
+    "fields": {
+        "name": "Giuseppe Tornatore",
+        "profile_path": "/pjVrtNGsCSNs5IeRVr34PMn1hVR.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 74091,
+    "fields": {
+        "name": "Makoto Shinkai",
+        "profile_path": "/mSCk6PmAR99bCsKJYlMx94vq5qe.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 1056121,
+    "fields": {
+        "name": "Ryan Coogler",
+        "profile_path": "/40n61jOMzHpDSnzLBQOSEEWlxEw.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 1485823,
+    "fields": {
+        "name": "Thomas Kail",
+        "profile_path": "/fe568wCZjaM7ZmSMcraYe3XN3tt.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 2042738,
+    "fields": {
+        "name": "Park Jun-soo",
+        "profile_path": ""
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 2377386,
+    "fields": {
+        "name": "MTJJ",
+        "profile_path": "/efpX3wZCpQ24uzUpKrWHxQXhc2m.jpg"
+    }
+},
+{
+    "model": "movies.director",
+    "pk": 2378215,
+    "fields": {
+        "name": "Bang Woo-ri",
+        "profile_path": "/ofaTg8VN5NniUjEyLnB9q5BWHcR.jpg"
+    }
+}
+]
