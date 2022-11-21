@@ -1,0 +1,86 @@
+[
+{
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$260000$6hAu8O4XSbJzPonkny99lE$EFgX7uhbryeA5pzBwIry85Pi7olnVgOa4jZd6j6SXts=",
+        "last_login": "2022-11-20T09:55:45.795Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2022-11-17T10:59:43.613Z",
+        "score": 0,
+        "groups": [],
+        "user_permissions": [],
+        "followings": [
+            3
+        ]
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$260000$fZAuD0Xr6TGM4W6btQfyNM$oWUD/fuOZ0+gpHu+U7ik3bU200gddM6DYGM4jv31/rE=",
+        "last_login": "2022-11-19T03:12:01.414Z",
+        "is_superuser": true,
+        "username": "admin2",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2022-11-17T11:00:07.188Z",
+        "score": 0,
+        "groups": [],
+        "user_permissions": [],
+        "followings": []
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$260000$Tm9203p7oFDS1noC4RYXP8$kkelRXMnsbNyVhuUPeNaxALrVkfX1+UfqsMDsQNIiXI=",
+        "last_login": "2022-11-19T10:49:08.733Z",
+        "is_superuser": false,
+        "username": "user1",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-11-18T05:07:36.083Z",
+        "score": 0,
+        "groups": [],
+        "user_permissions": [],
+        "followings": [
+            1
+        ]
+    }
+},
+{
+    "model": "accounts.user",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$260000$9FIvP9GuGdZu8E8Q8UONCY$8qHSDlyCO/T4qpEt4KVVEGDhWaSwQ8C7H1ePZ9N18y4=",
+        "last_login": "2022-11-20T08:02:33.034Z",
+        "is_superuser": false,
+        "username": "user3",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-11-20T08:02:32.868Z",
+        "score": 0,
+        "groups": [],
+        "user_permissions": [],
+        "followings": []
+    }
+}
+]
