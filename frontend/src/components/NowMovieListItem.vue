@@ -1,9 +1,11 @@
 <template>
-  <div>
-    <div style="width: 200px; cursor: pointer" @click="toMovieDetail">
-      <img style="width: 100%; object-fit: cover" :src="poster_url" />
-      <p>{{ movie.title }}</p>
-    </div>
+  <div
+    class="poster d-inline-block ms-5"
+    style="width: 200px; cursor: pointer"
+    @click="toMovieDetail"
+  >
+    <img style="width: 100%; object-fit: cover" :src="poster_url" />
+    <p>{{ movie.title }}</p>
   </div>
 </template>
 
@@ -33,4 +35,15 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.poster {
+  overflow: hidden;
+  transition: transform 0.2s linear;
+  border-radius: 20px;
+  box-shadow: 0 5px 10px 5px rgb(110, 110, 110);
+}
+
+.poster:hover {
+  transform: scale(1.1);
+}
+</style>

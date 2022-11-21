@@ -2,7 +2,8 @@
   <div id="movie_detail_header">
     <div
       class="d-flex justify-content-center mx-auto"
-      style="max-width: 2000px">
+      style="max-width: 2000px"
+    >
       <div id="movie_detail_header_poster" class="col-2">
         <img :src="poster_url" />
       </div>
@@ -11,8 +12,10 @@
           <h2 class="fw-bolder">{{ movie.title }}</h2>
           <div @click="likeMovie">
             <img
+              class="like-btn"
               :src="movie.isLiked ? heartPinkPath : heartGrayPath"
-              style="width: 50px" />
+              style="width: 50px"
+            />
             {{ movie.like_users_count }}
           </div>
         </div>
@@ -132,5 +135,17 @@ export default {
 
 hr {
   color: #b7b7b7;
+}
+
+.like-btn {
+  transition: transform 0.2s linear;
+}
+
+.like-btn:hover {
+  cursor: pointer;
+}
+
+.like-btn:active {
+  transform: scale(1.5);
 }
 </style>

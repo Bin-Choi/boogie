@@ -5,7 +5,8 @@
       <NowMovieListItem
         v-for="movie in nowMovies"
         :key="movie.id"
-        :movie="movie" />
+        :movie="movie"
+      />
     </div>
   </div>
 </template>
