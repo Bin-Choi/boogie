@@ -1,66 +1,54 @@
 <template>
   <div>
     <h1>Profile</h1>
-    <p>{{ person?.username }}</p>
-    <p>가입일: {{ dateJoined }}</p>
-    <p>점수: {{ person?.score }}점</p>
-    <p>팔로잉: {{ person?.followings.length }}명</p>
-    <p>팔로워: {{ person?.followers.length }}명</p>
-    <div v-if="person?.id !== user?.id" @click="follow">
-      <button
-        type="button"
-        :class="{
-          btn: true,
-          'btn-outline-primary': !isFollowed,
-          'btn-outline-secondary': isFollowed,
-        }"
-      >
-        {{ isFollowed ? '팔로잉 취소' : '팔로우' }}
-      </button>
+    <div v-if="person">
+      <ProfileBackdrop :person="person" @change_backdrop="changeBackdrop" />
+      <ProfileImage :person="person" @change_profile="changeProfile" />
+      <div>
+        <p>{{ person?.username }}</p>
+        <p>가입일: {{ dateJoined }}</p>
+        <p>점수: {{ person?.score }}점</p>
+        <!-- <p>팔로잉: {{ person?.followings.length }}명</p> -->
+        <!-- <p>팔로워: {{ person?.followers.length }}명</p> -->
+        <div v-if="person?.id !== user?.id" @click="follow">
+          <button
+            type="button"
+            :class="{
+              btn: true,
+              'btn-outline-primary': !isFollowed,
+              'btn-outline-secondary': isFollowed,
+            }"
+          >
+            {{ isFollowed ? '팔로잉 취소' : '팔로우' }}
+          </button>
+          <p>
+            선호장르
+            <span v-if="genrePreference?.length >= 1">{{
+              genrePreference[0][0]
+            }}</span>
+            <span v-if="genrePreference?.length >= 2">{{
+              genrePreference[1][0]
+            }}</span>
+            <span v-if="genrePreference?.length >= 3">{{
+              genrePreference[2][0]
+            }}</span>
+          </p>
+        </div>
+      </div>
+      <ProfileMovieList :likeMovies="person.like_movies" />
+      <ProfileReviewList :myReviews="person.my_reviews" />
+      <ProfilePostList :postTitle="'내가 작성한 글'" :post="person.my_posts" />
+      <ProfilePostList :postTitle="'글'" :post="person.like_posts" />
     </div>
-    <p>
-      선호장르
-      <span v-if="genrePreference.length >= 1">{{
-        genrePreference[0][0]
-      }}</span>
-      <span v-if="genrePreference.length >= 2">{{
-        genrePreference[1][0]
-      }}</span>
-      <span v-if="genrePreference.length >= 3">{{
-        genrePreference[2][0]
-      }}</span>
-    </p>
-    <p>영화 &#10084;</p>
-    <ProfileMovieListItem
-      v-for="movie in person?.like_movies"
-      :key="`movie-${movie.id}`"
-      :movie="movie"
-    />
-    <p>내 리뷰</p>
-    <ProfileReviewListItem
-      v-for="review in person?.my_reviews"
-      :key="`review-${review.id}`"
-      :review="review"
-    />
-    <p>내가 작성한 글</p>
-    <PostListItem
-      v-for="post in person?.my_posts"
-      :key="`my-${post.id}`"
-      :post="post"
-    />
-    <p>글 &#128077;</p>
-    <PostListItem
-      v-for="post in person?.like_posts"
-      :key="`like-${post.id}`"
-      :post="post"
-    />
   </div>
 </template>
 
 <script>
-import ProfileMovieListItem from '@/components/ProfileMovieListItem.vue'
-import ProfileReviewListItem from '@/components/ProfileReviewListItem.vue'
-import PostListItem from '@/components/PostListItem.vue'
+import ProfileBackdrop from '@/components/ProfileBackdrop.vue'
+import ProfileImage from '@/components/ProfileImage.vue'
+import ProfileMovieList from '@/components/ProfileMovieList.vue'
+import ProfileReviewList from '@/components/ProfileReviewList.vue'
+import ProfilePostList from '@/components/ProfilePostList.vue'
 import axios from 'axios'
 
 const API_URL = 'http://127.0.0.1:8000'
@@ -68,9 +56,11 @@ const API_URL = 'http://127.0.0.1:8000'
 export default {
   name: 'ProfileView',
   components: {
-    ProfileMovieListItem,
-    PostListItem,
-    ProfileReviewListItem,
+    ProfileImage,
+    ProfileBackdrop,
+    ProfileMovieList,
+    ProfileReviewList,
+    ProfilePostList,
   },
   data() {
     return {
@@ -149,6 +139,13 @@ export default {
         .catch((err) => {
           console.log(err)
         })
+    },
+    changeProfile(profileImage) {
+      this.person.profile_image.profile_image = profileImage
+    },
+    changeBackdrop(backdropImage) {
+      console.log(backdropImage)
+      this.person.backdrop_image.backdrop_image = backdropImage
     },
   },
   beforeRouteUpdate(to, from, next) {

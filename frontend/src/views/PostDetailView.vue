@@ -11,20 +11,26 @@
       class="btn btn-primary"
       @click="
         $router.push({ name: 'updatePost', params: { postId: post?.id } })
-      ">
+      "
+    >
       수정
     </button>
     <button
       v-if="post?.user === user.id"
       type="button"
       class="btn btn-danger"
-      @click="deletePost">
+      @click="deletePost"
+    >
       삭제
     </button>
     <hr />
     <p>내용: {{ post?.content }}</p>
     <div @click="likePost">
-      <img :src="isLiked ? likeBluePath : likeGrayPath" style="width: 50px" />
+      <img
+        class="thumb-btn"
+        :src="isLiked ? likeBluePath : likeGrayPath"
+        style="width: 50px"
+      />
       {{ post?.like_users_count }}
     </div>
     <hr />
@@ -134,4 +140,16 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.thumb-btn {
+  transition: transform 0.2s linear;
+}
+
+.thumb-btn:hover {
+  cursor: pointer;
+}
+
+.thumb-btn:active {
+  transform: scale(1.5);
+}
+</style>

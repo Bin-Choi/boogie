@@ -1,7 +1,7 @@
 <template>
   <div
     class="d-flex justify-content-between mt-3"
-    @click="toMovieDetail"
+    @click.stop="toMovieDetail"
     style="cursor: pointer"
   >
     <div>
@@ -11,7 +11,9 @@
         review.content
       }}</span>
     </div>
-    <span style="color: gray">{{ review.username }}</span>
+    <span style="color: gray" @click.stop="toProfile">{{
+      review.username
+    }}</span>
   </div>
 </template>
 
@@ -32,6 +34,14 @@ export default {
         name: 'movieDetail',
         params: { movieId: this.review.movie },
       })
+    },
+    toProfile() {
+      this.$router
+        .push({
+          name: 'profile',
+          params: { username: this.review.username },
+        })
+        .catch(() => {})
     },
   },
 }

@@ -10,6 +10,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.db.models import Prefetch
 
+from .serializers import ProfileSeriallizer, BackdropSeriallizer
 from community.serializers import PostListSerializer, CommentPostSerializer
 from community.models import Comment
 from movies.serializers import MovieListSerializer, ReviewSerializer, MovieSerializer, MovieGenreSerializer
@@ -36,6 +37,8 @@ def user_info(request, username):
             'username': user.username,
             'date_joined': user.date_joined,
             'score': user.score,
+            'profile_image': ProfileSeriallizer(user).data,
+            'backdrop_image': BackdropSeriallizer(user).data,
             'followings': [{following.username, following.id}  for following in user.followings.all()],
             'followers': [{follower.username, follower.id} for follower in user.followers.all()],
             'my_posts': PostListSerializer(user.post_set.all(), many=True).data,
@@ -55,7 +58,6 @@ def user_info(request, username):
         data['genre_preference'] = genre_preference
 
         return Response(data) 
-
     # # like_movies: MovieList, 근데 장르가 필요
     # user = User.objects.prefetch_related(
     #     Prefetch('review_set',  queryset=Review.objects.select_related('movie')),
@@ -116,3 +118,30 @@ def follow(request, user_pk):
             }
             return Response(data)
         return Response(status=status.HTTP_403_FORBIDDEN)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def profile(request, user_pk):
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
+    if user == request.user:
+        if request.method == 'PUT':
+            serializer = ProfileSeriallizer(user, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+    return Response(status=status.HTTP_403_FORBIDDEN)
+
+@api_view(['PUT', 'DELETE'])
+def backdrop(request, user_pk):
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
+    if user == request.user:
+        if request.method == 'PUT':
+            serializer = BackdropSeriallizer(user, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+    return Response(status=status.HTTP_403_FORBIDDEN)
