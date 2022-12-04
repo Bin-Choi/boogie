@@ -69,11 +69,13 @@
           </div>
         </div>
       </div>
-      <div class="col-11 col-lg-8 mx-auto" style="max-width: 1200px">
-        <ProfileMovieList class="mt-3" :likeMovies="person.like_movies" />
-        <ProfileLikePostList class="mt-3" :posts="person.like_posts" />
-        <ProfileReviewList class="mt-3" :myReviews="person.my_reviews" />
-        <ProfilePostList class="mt-3" :posts="person.my_posts" />
+      <div class="container" style="max-width: 1200px">
+        <div class="row col-12 col-lg-9 justify-content-center mx-auto">
+          <ProfileMovieList class="mt-3" :likeMovies="person.like_movies" />
+          <ProfileLikePostList class="mt-3" :posts="person.like_posts" />
+          <ProfileReviewList class="mt-3" :myReviews="person.my_reviews" />
+          <ProfilePostList class="mt-3" :posts="person.my_posts" />
+        </div>
       </div>
     </div>
   </div>

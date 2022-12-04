@@ -1,66 +1,60 @@
 <template>
   <div>
-    <div v-if="!myReview" id="review_form" class="d-flex">
+    <div v-if="!myReview" id="review_form">
       <div id="stars" class="pt-1 me-3 mb-2">
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(1, $event)"
           @mouseleave="uncolorStar(1, $event)"
           @click="saveScore(1, $event)"
-          style="width: 40px"
-        />
+          style="width: 40px" />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(2, $event)"
           @mouseleave="uncolorStar(2, $event)"
           @click="saveScore(2, $event)"
-          style="width: 40px"
-        />
+          style="width: 40px" />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(3, $event)"
           @mouseleave="uncolorStar(3, $event)"
           @click="saveScore(3, $event)"
-          style="width: 40px"
-        />
+          style="width: 40px" />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(4, $event)"
           @mouseleave="uncolorStar(4, $event)"
           @click="saveScore(4, $event)"
-          style="width: 40px"
-        />
+          style="width: 40px" />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(5, $event)"
           @mouseleave="uncolorStar(5, $event)"
           @click="saveScore(5, $event)"
-          style="width: 40px"
-        />
+          style="width: 40px" />
       </div>
-      <div class="mb-2">
+      <div class="d-flex mb-2">
         <input
           id="review_text_form"
           type="text"
           v-model.trim="content"
-          @keyup.enter="createReview"
-        />
+          @keyup.enter="createReview" />
         <div class="write d-inline-block ms-3" @click="createReview">
           <img :src="require('@/assets/write.png')" alt="" />
         </div>
       </div>
     </div>
     <div v-if="myReview" class="d-flex justify-content-between">
-      <div class="d-flex align-items-center">
-        <div style="width: 180px">
+      <div class="d-flex flex-wrap align-items-center mb-3">
+        <div style="width: 180px" class="me-3">
           <img :src="myReviewStarPath" style="width: 100%" />
         </div>
-        <div class="fs-5 fw-bold ms-3">
+        <div class="fs-5 fw-bold mt-1">
           {{ myReview.content }}
         </div>
-      </div>
-      <div class="delete d-inline-block ms-3 me-1" @click="deleteReview">
-        <img :src="require('@/assets/trashcan.png')" alt="" />
+        <div class="delete d-inline-block ms-3 me-1" @click="deleteReview">
+          <img :src="require('@/assets/trashcan.png')" alt="" />
+        </div>
       </div>
     </div>
   </div>
@@ -207,7 +201,7 @@ export default {
 }
 
 #review_text_form {
-  width: 300px;
+  width: 280px;
   height: 40px;
   border: none;
   border-radius: 5px;

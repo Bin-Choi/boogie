@@ -1,12 +1,11 @@
 <template>
   <div>
     <h5 class="fw-bold p-3" style="text-align: left">네이버 블로그 검색결과</h5>
-    <div class="search-naver-list px-4">
+    <div class="search-naver-list px-3 mb-3">
       <SearchNaverListItem
         v-for="(blog, index) in searchList"
         :key="index"
-        :blog="blog"
-      />
+        :blog="blog" />
     </div>
   </div>
 </template>

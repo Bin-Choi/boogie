@@ -2,42 +2,44 @@
   <div
     id="movie_detail_header"
     :class="darkMode ? 'header-dark' : 'header-light'">
-    <div
-      class="d-flex justify-content-center mx-auto"
-      style="max-width: 2000px">
-      <div id="movie_detail_header_poster" class="col-2">
-        <img :src="poster_url" />
-      </div>
-      <div id="movie_detail_header_info" class="col-6 ps-4 pt-4 text-start">
-        <div class="d-flex align-items-center">
-          <h2 class="d-inline-block fw-bolder">{{ movie.title }}</h2>
-          <span @click="likeMovie">
-            <img
-              class="like-btn ms-3 mb-2"
-              :src="movie.is_liked ? heartPinkPath : heartGrayPath"
-              style="width: 30px" />
-          </span>
-          <span
-            class="mb-2 ms-2 like-number"
-            :class="{
-              'font-pink': movie.is_liked,
-              'font-gray': !movie.is_liked,
-            }">
-            {{ movie.like_users_count }}
-          </span>
+    <div class="container" style="max-width: 2000px">
+      <div class="row justify-content-center">
+        <div id="movie_detail_header_poster" class="p-0">
+          <img :src="poster_url" />
         </div>
+        <div
+          id="movie_detail_header_info"
+          class="col-12 col-lg-5 ps-4 pt-4 text-start">
+          <div class="d-flex align-items-center">
+            <h2 class="d-inline-block fw-bolder">{{ movie.title }}</h2>
+            <span @click="likeMovie">
+              <img
+                class="like-btn ms-3 mb-2"
+                :src="movie.is_liked ? heartPinkPath : heartGrayPath"
+                style="width: 30px" />
+            </span>
+            <span
+              class="mb-2 ms-2 like-number"
+              :class="{
+                'font-pink': movie.is_liked,
+                'font-gray': !movie.is_liked,
+              }">
+              {{ movie.like_users_count }}
+            </span>
+          </div>
 
-        <p class="fs-6" style="color: gray">
-          {{ movie.release_date }} · {{ genres }} · {{ movie?.country }}
-        </p>
-        <hr />
-        <p class="fs-6 fw-bold">
-          평균⭐ {{ Math.round(movie.vote_average * 5) / 10 }}점 ({{
-            movie.vote_count
-          }}명)
-        </p>
-        <hr />
-        <ReviewForm />
+          <p class="fs-6" style="color: gray">
+            {{ movie.release_date }} · {{ genres }} · {{ movie?.country }}
+          </p>
+          <hr />
+          <p class="fs-6 fw-bold">
+            평균⭐ {{ Math.round(movie.vote_average * 5) / 10 }}점 ({{
+              movie.vote_count
+            }}명)
+          </p>
+          <hr />
+          <ReviewForm />
+        </div>
       </div>
     </div>
   </div>

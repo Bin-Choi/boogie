@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3">
+  <div class="py-3 px-2">
     <h5 class="fw-bold">영화 검색결과</h5>
     <div class="mt-3 mb-2">
       <SearchMovieListItem

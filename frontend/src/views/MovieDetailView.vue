@@ -5,20 +5,20 @@
     </div>
     <div v-if="movie">
       <MovieDetailHeader />
-      <div class="container col-11 col-lg-8" style="max-width: 1200px">
-        <div class="row">
+      <div class="container" style="max-width: 1200px">
+        <div class="row justify-content-center">
           <div
-            class="col-12 col-lg-8 d-flex flex-column mt-3"
+            class="col-12 col-lg-6 d-flex flex-column mt-3"
             style="height: 844px">
             <MovieDetailInfo style="height: 574px" />
             <ReviewList style="margin-top: 15px; height: 255px" />
           </div>
-          <div class="col-12 col-lg-4 mt-3">
+          <div class="col-12 col-lg-3 mt-3">
             <VideoList class="video-list" />
           </div>
         </div>
-        <div class="row">
-          <div class="col-12">
+        <div class="row justify-content-center">
+          <div class="col-12 col-lg-9">
             <RelatedMovieList style="max-width: 1200px" />
           </div>
         </div>

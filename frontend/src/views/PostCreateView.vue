@@ -35,6 +35,7 @@ export default {
       editorConfig: {
         // The configuration of the editor.
         height: '400px',
+        removeButtons: 'Maximize, ShowBlocks',
       },
     }
   },
