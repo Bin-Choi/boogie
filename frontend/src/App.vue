@@ -75,6 +75,15 @@
 
     <router-view />
 
+    <div
+      class="theme d-inline-block ms-1"
+      @click="$store.commit('TOGGLE_DARK_MODE', !darkMode)">
+      <img
+        :src="
+          darkMode ? require('@/assets/sun.png') : require('@/assets/moon.png')
+        " />
+    </div>
+
     <div id="footer" class="mt-3">
       <div class="container">
         <div class="row justify-content-center mt-3">
@@ -89,8 +98,8 @@
         <div class="row justify-content-center mt-3">
           <div class="col-7 col-lg-3">
             <div class="fw-bold">Created by</div>
-            <div style="height: 30px" class="d-flex align-items-center">
-              <span class="me-2">이병호</span>
+            <div>
+              <div class="me-2">이병호</div>
               <a
                 href="https://github.com/Byongho96"
                 target="_blank"
@@ -115,8 +124,8 @@
                 unlike96</span
               >
             </div>
-            <div style="height: 30px" class="d-flex align-items-center">
-              <span class="me-2">최성빈</span>
+            <div>
+              <div class="me-2">최성빈</div>
               <a
                 href="https://github.com/Bin-Choi"
                 target="_blank"
@@ -303,7 +312,7 @@ input::placeholder {
   min-height: 200px;
   padding: 15px;
   color: rgba(255, 255, 255, 0.566);
-  font-size: 15px;
+  font-size: 1em;
   text-align: left;
 }
 
