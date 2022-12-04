@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h5>[HOT] 뜨거웡</h5>
+  <div class="p-3" :class="darkMode ? 'box-dark' : 'box-light'">
+    <h5 class="fw-bold">HOT 게시글</h5>
     <hr />
     <HotPostListItem v-for="post in hotPosts" :key="post.id" :post="post" />
   </div>
@@ -10,7 +10,7 @@
 import HotPostListItem from '@/components/HotPostListItem'
 import axios from 'axios'
 
-const API = 'http://127.0.0.1:8000'
+// const API_URL = 'https://boogiee.site'
 
 export default {
   name: 'HotPostList',
@@ -20,6 +20,14 @@ export default {
       hotPosts: [],
     }
   },
+  computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
+    darkMode() {
+      return this.$store.state.darkMode
+    },
+  },
   created() {
     this.getHotPosts()
   },
@@ -27,7 +35,7 @@ export default {
     getHotPosts() {
       axios({
         method: 'get',
-        url: `${API}/community/posts/hot/`,
+        url: `${this.API_URL}/community/posts/hot/`,
       })
         .then((res) => {
           this.hotPosts = res.data

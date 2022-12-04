@@ -1,22 +1,23 @@
 <template>
   <div
-    class="d-flex justify-content-between mt-3"
-    @click="toMovieDetail"
+    class="d-flex justify-content-between p-2 review_item"
+    @click.stop="toMovieDetail"
     style="cursor: pointer">
-    <div>
-      <span>{{ review.movie_title }}</span>
-      <img :src="starsPath" style="width: 150px" />
-      <span class="fs-6 fw-bold" style="margin-left: 20px">{{
-        review.content
-      }}</span>
+    <div class="col-2 fw-bold" style="text-align: left">
+      {{ review.movie_title }}
     </div>
-    <span style="color: gray">{{ review.username }}</span>
+    <div class="col-2" style="text-align: left">
+      <img :src="starsPath" style="width: 100%" />
+    </div>
+    <div class="col-5" style="text-align: left">
+      {{ review.content }}
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'ProfileReviewListItem',
+  name: 'RecentReviewListItem',
   props: {
     review: Object,
   },
@@ -36,4 +37,18 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.review_item:hover {
+  transition: transform 0.2s linear;
+}
+
+.review_item:hover {
+  transform: scale(1.05);
+  background-color: rgba(219, 219, 219, 0.459);
+  border-radius: 10px;
+}
+.username:hover {
+  background-color: rgb(194, 194, 194);
+  border-radius: 3px;
+}
+</style>

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h4>최 근 리 뷰</h4>
+  <div class="p-3" :class="darkMode ? 'box-dark' : 'box-light'">
+    <h5 class="fw-bold">최근 리뷰</h5>
     <hr />
     <RecentReviewListItem
       v-for="review in recentReviews"
@@ -13,7 +13,7 @@
 import RecentReviewListItem from './RecentReviewListItem.vue'
 import axios from 'axios'
 
-const API = 'http://127.0.0.1:8000'
+// const API_URL = 'https://boogiee.site'
 
 export default {
   components: { RecentReviewListItem },
@@ -23,6 +23,14 @@ export default {
       recentReviews: [],
     }
   },
+  computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
+    darkMode() {
+      return this.$store.state.darkMode
+    },
+  },
   created() {
     this.getRecentReviews()
   },
@@ -30,7 +38,7 @@ export default {
     getRecentReviews() {
       axios({
         method: 'get',
-        url: `${API}/movies/reviews/recent/`,
+        url: `${this.API_URL}/movies/reviews/recent/`,
       })
         .then((res) => {
           this.recentReviews = res.data

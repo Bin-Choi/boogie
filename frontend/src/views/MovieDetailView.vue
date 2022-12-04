@@ -5,14 +5,24 @@
     </div>
     <div v-if="movie">
       <MovieDetailHeader />
-      <div class="d-flex col-8 mx-auto mt-5" style="max-width: 1200px">
-        <div class="col-8" style="margin-right: 30px">
-          <MovieDetailInfo />
-          <ReviewList class="mt-3" />
+      <div class="container col-11 col-lg-8" style="max-width: 1200px">
+        <div class="row">
+          <div
+            class="col-12 col-lg-8 d-flex flex-column mt-3"
+            style="height: 844px">
+            <MovieDetailInfo style="height: 574px" />
+            <ReviewList style="margin-top: 15px; height: 255px" />
+          </div>
+          <div class="col-12 col-lg-4 mt-3">
+            <VideoList class="video-list" />
+          </div>
         </div>
-        <VideoList class="col-4" />
+        <div class="row">
+          <div class="col-12">
+            <RelatedMovieList style="max-width: 1200px" />
+          </div>
+        </div>
       </div>
-      <RecoMovieList />
     </div>
   </div>
 </template>
@@ -20,7 +30,7 @@
 <script>
 import MovieDetailHeader from '@/components/MovieDetailHeader.vue'
 import MovieDetailInfo from '@/components/MovieDetailInfo.vue'
-import RecoMovieList from '@/components/RecoMovieList.vue'
+import RelatedMovieList from '@/components/RelatedMovieList.vue'
 import ReviewList from '@/components/ReviewList.vue'
 import VideoList from '@/components/VideoList.vue'
 
@@ -31,7 +41,7 @@ export default {
     MovieDetailInfo,
     ReviewList,
     VideoList,
-    RecoMovieList,
+    RelatedMovieList,
   },
   computed: {
     movie() {
@@ -60,7 +70,13 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+@media (min-width: 992px) {
+  .video-list {
+    height: 844px;
+  }
+}
+
 #movie_detail_backdrop {
   width: 100%;
   height: 300px;

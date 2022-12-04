@@ -25,6 +25,12 @@ class MovieListSerializer(serializers.ModelSerializer):
         model = Movie
         fields = ('id', 'title', 'poster_path', 'vote_average',)
 
+class MovieListGenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ('id', 'title', 'poster_path', 'vote_average', 'genres')
+
 class MovieSerializer(serializers.ModelSerializer):
     actors = ActorSerializer(many=True, read_only=True)
     directors = DirectorSerializer(many=True, read_only=True)
@@ -33,7 +39,7 @@ class MovieSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Movie
-        fields = '__all__'
+        exclude= ('like_users',)
 
 class ReviewSerializer(serializers.ModelSerializer):
     movie_title = serializers.CharField(source='movie.title', read_only=True)

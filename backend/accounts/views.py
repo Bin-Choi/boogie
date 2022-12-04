@@ -1,3 +1,4 @@
+# rest_framework
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -6,24 +7,22 @@ from rest_framework import status
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from django.shortcuts import get_list_or_404, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.db.models import Prefetch
 
-from .serializers import ProfileSeriallizer, BackdropSeriallizer
-from community.serializers import PostListSerializer, CommentPostSerializer
-from community.models import Comment
-from movies.serializers import MovieListSerializer, ReviewSerializer, MovieSerializer, MovieGenreSerializer
-from movies.models import Movie, Review
+from movies.models import Movie, Genre
+from movies.serializers import MovieListSerializer, ReviewSerializer
+from community.serializers import PostListSerializer
+from .serializers import ProfileSeriallizer, BackdropSeriallizer, UserListSerializer, UserPreferenceSerializer
 
-from collections import defaultdict
 # Create your views here.
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def user_info(request, username):
     if request.method == 'GET':
         User = get_user_model()
 
-        # Step1. 필요한 정보 일단 다 생성해서 보내기
+        # Step1. 필요한 정보 일단 다 가져오기
         user = User.objects.prefetch_related(
             'followings', 'followers',
             'post_set', 'like_posts',
@@ -32,71 +31,39 @@ def user_info(request, username):
             'review_set',
         ).get(username=username)
 
+        # Step2. 팔로잉 정보 계산
+        followers = user.followers.all()
+        if request.user in followers:
+            is_followed = True
+        else:
+            is_followed = False
+
+        # Step3. 취향장르 TOP3 출력
+        genre_preference = []
+        preference_data = UserPreferenceSerializer(user).data
+        for genre in preference_data:
+            if preference_data[genre] > 0:
+                genre_preference.append({'genre': Genre.objects.get(field_name=genre).name, 'score': preference_data[genre]})
+        genre_preference = sorted(genre_preference, key= lambda x: x['score'], reverse=True)[:3]
+
         data = {
             'id': user.id,
             'username': user.username,
             'date_joined': user.date_joined,
             'score': user.score,
-            'profile_image': ProfileSeriallizer(user).data,
-            'backdrop_image': BackdropSeriallizer(user).data,
-            'followings': [{following.username, following.id}  for following in user.followings.all()],
-            'followers': [{follower.username, follower.id} for follower in user.followers.all()],
+            'genre_preference': genre_preference,
+            'profile_image': ProfileSeriallizer(user).data['profile_image'],
+            'backdrop_image': BackdropSeriallizer(user).data['backdrop_image'],
+            'followings': UserListSerializer(user.followings.all(), many=True).data,
+            'followers': UserListSerializer(followers, many=True).data,
             'my_posts': PostListSerializer(user.post_set.all(), many=True).data,
             'like_posts': PostListSerializer(user.like_posts.all(), many=True).data,
             'like_movies': MovieListSerializer(user.like_movies.all(), many=True).data,
             'my_reviews': ReviewSerializer(user.review_set.all(), many=True).data,
+            'is_followed': is_followed
         }
 
-        # Step2. 취향 장르 분석. review로 보완 필요
-        # print(user.like_movies.all().genres)
-        genre_preference = defaultdict(int)
-        movies_genres = MovieGenreSerializer(user.like_movies.all(), many=True).data
-        for genres in movies_genres:
-            for genre in genres['genres']:
-                genre_preference[genre['name']] += 1
-
-        data['genre_preference'] = genre_preference
-
-        return Response(data) 
-    # # like_movies: MovieList, 근데 장르가 필요
-    # user = User.objects.prefetch_related(
-    #     Prefetch('review_set',  queryset=Review.objects.select_related('movie')),
-    #     Prefetch('like_movies', queryset=Movie.objects.prefetch_related('genres'))
-    # ).get(username=username)
-    
-    # data = {
-    #     # 'reviews': MovieSerializer(user.review_set.movie, many=True).data,
-    #     'like_movies': MovieGenreSerializer(user.like_movies.all(), many=True).data,
-    #     }
-
-    # return Response(data) 
-    # user = User.objects.prefetch_related(
-    #     'followings', 'followers', 'post_set', 'like_posts', 'comment_set', 'like_movies', 'like_movies__genres', 'review_set',).get(username=username)
-    #     # 'followings', 'followers', 'post_set', 'like_posts','comment_set__po', 'review_set',).get(username=username)
-        
-    # # 팔로잉, 팔로워
-    # # 내가 쓴 글
-    # # 내가 좋아요 한 글
-    # # 내가 댓글 단 글
-    # # 내가 쓴 리뷰
-    # # 내가 찜한 영화
-    
-    # data = {
-    #     'id': user.id,
-    #     'username': user.username,
-    #     'date_joined': user.date_joined,
-    #     'score': user.score,
-    #     'followings': [{following.username, following.id}  for following in user.followings.all()],
-    #     'followers': [{follower.username, follower.id} for follower in user.followers.all()],
-    #     'my_posts': PostListSerializer(user.post_set.all(), many=True).data,
-    #     'like_posts': PostListSerializer(user.like_posts.all(), many=True).data,
-    #     # 'commented_posts': PostListSerializer(user.comment_set.post., many=True).data,
-    #     # 'like_movies': MovieListSerializer(user.like_movies.all(), many=True).data,
-    #     'like_movies_genres': [genre.id for genre in user.like_movies.genres.all()],
-    #     'my_reviews': ReviewSerializer(user.review_set.all(), many=True).data,
-    #     }
-
-    # return Response(data) 
+        return Response(data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -119,7 +86,7 @@ def follow(request, user_pk):
             return Response(data)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
-@api_view(['PUT'])
+@api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def profile(request, user_pk):
     User = get_user_model()
@@ -131,9 +98,16 @@ def profile(request, user_pk):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return Response(serializer.data)
+
+        if request.method== 'DELETE':
+            default_profile = 'profile/default.png'
+            user.profile_image = default_profile
+            user.save()
+            return Response({'profile_image': '/media/' + default_profile})
     return Response(status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def backdrop(request, user_pk):
     User = get_user_model()
     user = User.objects.get(pk=user_pk)
@@ -144,4 +118,22 @@ def backdrop(request, user_pk):
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return Response(serializer.data)
+
+        if request.method== 'DELETE':
+            default_backdrop = 'backdrop/default.jpg'
+            user.profile_image = default_backdrop
+            user.save()
+            return Response({'backdrop_image': '/media/' + default_backdrop})
+    return Response(status=status.HTTP_403_FORBIDDEN)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def withdraw(request, user_pk):
+    User = get_user_model()
+    user = User.objects.get(pk=user_pk)
+
+    if user == request.user:
+        if request.method== 'DELETE':
+            user.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(status=status.HTTP_403_FORBIDDEN)

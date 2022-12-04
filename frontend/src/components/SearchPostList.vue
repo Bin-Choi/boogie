@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <h5>게 시 판</h5>
-    <hr />
+  <div class="pb-3">
+    <h5 class="fw-bold p-3" style="text-align: left">게시판 검색결과</h5>
     <SearchPostListItem
       v-for="(post, index) in searchList"
       :key="index"
@@ -14,7 +13,7 @@
 import SearchPostListItem from '@/components/SearchPostListItem.vue'
 import axios from 'axios'
 
-const URL = 'http://127.0.0.1:8000'
+// const API_URL = "https://boogiee.site"
 
 export default {
   name: 'SearchPostList',
@@ -26,6 +25,16 @@ export default {
       searchList: [],
     }
   },
+  computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
+  },
+  watch: {
+    $route() {
+      this.getSearchList()
+    },
+  },
   created() {
     this.getSearchList()
   },
@@ -33,7 +42,7 @@ export default {
     getSearchList() {
       axios({
         method: 'get',
-        url: `${URL}/community/posts/search/${this.$route.params.query}/`,
+        url: `${this.API_URL}/community/posts/search/${this.$route.params.query}/`,
       })
         .then((res) => {
           console.log(res)

@@ -1,8 +1,9 @@
 <template>
-  <div>
-    <h4 class="fw-bold">출연진</h4>
-    <div class="d-flex" style="margin-left: 10px">
+  <div style="height: 204px">
+    <h5 class="fw-bold">출연진</h5>
+    <div class="d-flex actor-list">
       <ActorListItem
+        class="mt-1"
         v-for="actor in actors"
         :actor="actor"
         :key="actor.name"
@@ -24,10 +25,30 @@ export default {
       return this.$store.state.movie
     },
     actors() {
-      return this.movie.directors.concat(this.movie.actors).slice(0, 5)
+      return this.movie.directors.concat(this.movie.actors)
     },
   },
 }
 </script>
 
-<style></style>
+<style scoped>
+.actor-list {
+  margin-left: 10px;
+  margin-right: 10px;
+  overflow-x: scroll;
+}
+.actor-list::-webkit-scrollbar {
+  height: 15px; /*스크롤바의 너비*/
+}
+
+.actor-list::-webkit-scrollbar-thumb {
+  background-color: rgb(171, 149, 192); /*스크롤바의 색상*/
+  border-radius: 10px; /*스크롤바 라운드*/
+}
+
+.actor-list::-webkit-scrollbar-track {
+  background-color: rgb(234, 215, 235); /*스크롤바 트랙 색상*/
+  border-radius: 10px; /*스크롤바 트랙 라운드*/
+  /* box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.2); */
+}
+</style>

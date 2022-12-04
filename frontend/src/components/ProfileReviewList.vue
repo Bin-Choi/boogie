@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <p>내 리뷰</p>
+  <div class="p-3" :class="darkMode ? 'box-dark' : 'box-light'">
+    <h5 class="fw-bold">내 리뷰</h5>
     <ProfileReviewListItem
       v-for="review in myReviews"
       :key="`review-${review.id}`"
@@ -18,6 +18,11 @@ export default {
   },
   props: {
     myReviews: Array,
+  },
+  computed: {
+    darkMode() {
+      return this.$store.state.darkMode
+    },
   },
 }
 </script>

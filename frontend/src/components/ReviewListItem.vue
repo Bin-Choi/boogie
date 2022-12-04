@@ -1,12 +1,12 @@
 <template>
   <div class="d-flex justify-content-between mt-3">
     <div>
-      <img :src="starsPath" style="width: 150px" />
-      <span class="fs-6 fw-bold" style="margin-left: 20px">{{
-        review.content
-      }}</span>
+      <img :src="starsPath" style="width: 120px" />
+      <span class="fs-6" style="margin-left: 20px">{{ review.content }}</span>
     </div>
-    <span style="color: gray">{{ review.username }}</span>
+    <span class="username" style="color: gray" @click.stop="toProfile">{{
+      review.username
+    }}</span>
   </div>
 </template>
 
@@ -21,7 +21,22 @@ export default {
       return require(`@/assets/stars_${this.review.vote}.png`)
     },
   },
+  methods: {
+    toProfile() {
+      this.$router
+        .push({
+          name: 'profile',
+          params: { username: this.review.username },
+        })
+        .catch(() => {})
+    },
+  },
 }
 </script>
 
-<style></style>
+<style scoped>
+.username:hover {
+  cursor: pointer;
+  background-color: lightgrey;
+}
+</style>

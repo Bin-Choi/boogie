@@ -1,24 +1,43 @@
 <template>
-  <div @mouseenter="hover = !hover" @mouseleave="hover = !hover">
-    <span>{{ comment.username }} : {{ comment.content }}</span>
-    <button v-if="hover" @click="selectComment">대댓글 작성</button>
-    <button
-      v-if="comment.user === user.id"
-      type="button"
-      class="btn btn-danger"
-      @click="deleteComment">
-      X
-    </button>
-    <div v-if="comment.id === selectedComment">
-      <input type="text" v-model="content" @keyup.enter="createRecomment" />
-      <button @click="createRecomment">작성</button>
+  <div>
+    <div
+      class="comment d-flex justify-content-between align-itmes-center py-2"
+      @mouseenter="hover = true"
+      @mouseleave="hover = false">
+      <div class="ms-4">
+        <span class="fw-bold">{{ comment.username }}</span>
+        <span class="ms-3">{{ comment.content }}</span>
+        <button class="recomment-btn ms-3" v-if="hover" @click="selectComment">
+          대댓글
+        </button>
+      </div>
+      <div
+        v-if="comment.user === user?.id"
+        class="delete d-inline-block ms-4 me-3"
+        @click="deleteComment">
+        <img :src="require('@/assets/trashcan.png')" alt="" />
+      </div>
     </div>
+    <div class="ms-4" v-if="comment.id === selectedComment">
+      <input
+        class="recomment-form"
+        type="text"
+        v-model="content"
+        @keyup.enter="createRecomment" />
+      <button
+        class="ms-3"
+        style="border: none; border-radius: 3px"
+        @click="createRecomment">
+        작성
+      </button>
+    </div>
+
     <RecommentItem
       v-for="recomment in recomments"
       :key="recomment.id"
       :recomment="recomment"
       @get_comments="$emit('get_comments')"
-      class="ms-3" />
+      class="ms-4" />
   </div>
 </template>
 
@@ -26,7 +45,7 @@
 import RecommentItem from '@/components/RecommentItem.vue'
 import axios from 'axios'
 
-const API_URL = 'http://127.0.0.1:8000'
+// const API_URL = "https://boogiee.site"
 
 export default {
   name: 'CommentListItem',
@@ -44,6 +63,9 @@ export default {
     }
   },
   computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
     comment() {
       return this.comments[0]
     },
@@ -61,6 +83,7 @@ export default {
     createRecomment() {
       if (!this.isLogin) {
         alert('로그인을 해주세요')
+        this.$store.commit('TOGGLE_LOGIN_MODAL', true)
         return
       }
       const content = this.content
@@ -70,7 +93,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: `${API_URL}/community/posts/${this.$route.params.postId}/comments/${this.comment.id}/`,
+        url: `${this.API_URL}/community/posts/${this.$route.params.postId}/comments/${this.comment.id}/`,
         data: {
           content: content,
         },
@@ -91,7 +114,7 @@ export default {
     deleteComment() {
       axios({
         method: 'delete',
-        url: `${API_URL}/community/posts/${this.$route.params.postId}/comments/${this.comment.id}/`,
+        url: `${this.API_URL}/community/posts/${this.$route.params.postId}/comments/${this.comment.id}/`,
         headers: {
           Authorization: `Token ${this.$store.state.token}`,
         },
@@ -112,4 +135,48 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+hr {
+  margin-left: 7px;
+  margin-right: 7px;
+  margin-top: 0.1rem;
+  margin-bottom: 0.05rem;
+}
+.comment:hover {
+  background-color: rgba(239, 239, 239, 0.436);
+  border-radius: 5px;
+}
+.comment {
+  transition: transform 0.2s;
+}
+
+.delete {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.delete img {
+  width: 100%;
+  filter: opacity(0.85) drop-shadow(0 0 0 white);
+}
+
+.recomment-btn {
+  border: none;
+  outline: none;
+  border-radius: 5px;
+}
+.recomment-btn:hover {
+  background-color: rgb(224, 224, 224);
+}
+
+.recomment-form {
+  width: 250px;
+  height: 27px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  padding-left: 10px;
+  box-shadow: inset 0 0 3px rgb(186, 186, 186);
+}
+</style>

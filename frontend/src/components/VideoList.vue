@@ -1,17 +1,18 @@
 <template>
-  <div id="video-list" class="p-3">
-    <h4 class="fw-bold">예고편</h4>
-    <VideoListItem
-      v-for="(video, index) in videoList"
-      :key="index"
-      :video="video"
-    />
+  <div :class="darkMode ? 'box-dark' : 'box-light'" class="p-3">
+    <h5 class="fw-bold">예고편</h5>
+    <div class="video-list">
+      <VideoListItem
+        v-for="(video, index) in videoList"
+        :key="index"
+        :video="video" />
+    </div>
   </div>
 </template>
 
 <script>
 import VideoListItem from './VideoListItem.vue'
-// import axios from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'VideoList',
@@ -24,40 +25,40 @@ export default {
     }
   },
   computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
     movie() {
       return this.$store.state.movie
     },
+    darkMode() {
+      return this.$store.state.darkMode
+    },
   },
-  methods: {
-    getVideoList() {
-      // const params = {
-      //   key: 'AIzaSyAf1G4zWkG8KhIs062j2OEModwcv_O_PZg',
-      //   part: 'snippet',
-      //   type: 'video',
-      //   q: this.movie.title + '예고편',
-      // }
-      // axios({
-      //   method: 'get',
-      //   url: 'https://www.googleapis.com/youtube/v3/search',
-      //   params,
-      // })
-      //   .then((res) => {
-      //     this.videoList = res.data.items.slice(0, 3)
-      //     // this.videoList = res.data.items
-      //   })
-      //   .catch((err) => {
-      //     console.log(err)
-      //   })
+  watch: {
+    movie() {
+      this.getVideoList()
     },
   },
   created() {
     this.getVideoList()
   },
+  methods: {
+    getVideoList() {
+      axios({
+        method: 'get',
+        url: `${this.API_URL}/movies/${this.movie.title}/videos/`,
+      })
+        .then((res) => {
+          console.log(res)
+          this.videoList = res.data.items
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+  },
 }
 </script>
 
-<style>
-#video-list {
-  background-color: white;
-}
-</style>
+<style></style>

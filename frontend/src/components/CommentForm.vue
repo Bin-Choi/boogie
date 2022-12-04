@@ -1,14 +1,14 @@
 <template>
   <div>
-    <form @submit.prevent="createComment">
-      <label for="content">내용 :</label>
+    <form
+      @submit.prevent="createComment"
+      class="d-flex justify-content-center align-items-center">
       <textarea
         id="content"
-        cols="20"
-        rows="3"
+        class="comment-form mt-3"
         v-model="content"
         @keyup.enter="createComment"></textarea>
-      <input type="submit" id="submit" />
+      <input class="btn submit-btn mt-3 ms-3" type="submit" id="submit" />
     </form>
   </div>
 </template>
@@ -16,7 +16,7 @@
 <script>
 import axios from 'axios'
 
-const API_URL = 'http://127.0.0.1:8000'
+// const API_URL = "https://boogiee.site"
 
 export default {
   name: 'CommentForm',
@@ -26,6 +26,9 @@ export default {
     }
   },
   computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
     isLogin() {
       return this.$store.getters.isLogin
     },
@@ -34,6 +37,7 @@ export default {
     createComment() {
       if (!this.isLogin) {
         alert('로그인을 해주세요')
+        this.$store.commit('TOGGLE_LOGIN_MODAL', true)
         return
       }
       const content = this.content
@@ -43,7 +47,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: `${API_URL}/community/posts/${this.$route.params.postId}/comments/`,
+        url: `${this.API_URL}/community/posts/${this.$route.params.postId}/comments/`,
         data: {
           content: content,
         },
@@ -65,4 +69,29 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.comment-form {
+  width: 300px;
+  height: 50px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  padding-left: 10px;
+  box-shadow: inset 0 0 5px rgb(186, 186, 186);
+}
+
+form {
+  /* padding: 10px 0px 10px 0px;
+  background-color: rgba(219, 219, 219, 0.459); */
+}
+
+.submit-btn {
+  color: white;
+  background-color: rgb(135, 96, 167);
+}
+
+.submit-btn:hover {
+  color: white;
+  background-color: rgb(91, 53, 123);
+}
+</style>

@@ -1,18 +1,14 @@
 <template>
-  <div
-    class="poster d-inline-block ms-5"
-    style="width: 200px; cursor: pointer"
-    @click="toMovieDetail"
-  >
-    <img style="width: 100%; object-fit: cover" :src="poster_url" />
-    <p>{{ movie.title }}</p>
-  </div>
+  <figure @click="toMovieDetail">
+    <img :src="poster_url" style="height: 100%" />
+  </figure>
 </template>
 
 <script>
 export default {
   name: 'ProfileMovieListItem',
   props: {
+    index: Number,
     movie: Object,
   },
   computed: {
@@ -35,15 +31,4 @@ export default {
 }
 </script>
 
-<style scoped>
-.poster {
-  overflow: hidden;
-  transition: transform 0.2s linear;
-  border-radius: 20px;
-  box-shadow: 0 5px 10px 5px rgb(110, 110, 110);
-}
-
-.poster:hover {
-  transform: scale(1.1);
-}
-</style>
+<style scoped></style>

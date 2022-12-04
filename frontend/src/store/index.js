@@ -5,21 +5,41 @@ import router from '@/router'
 
 import createPersistedState from 'vuex-persistedstate'
 
+// vuex 암호화. 하지만 sessionStorage는 지원하지 않음
+// import SecureLS from 'secure-ls'
+// const ls = new SecureLS({ isCompression: false })
+// window.sessionStorage.getItem = (key) => ls.get(key)
+// window.sessionStorage.setItem = (key, value) => ls.set(key, value)
+// window.sessionStorage.removeItem = (key) => ls.remove(key)
+
 Vue.use(Vuex)
 
 // dj-rest-auth docs
 // https://dj-rest-auth.readthedocs.io/en/latest/api_endpoints.html
-const API_URL = 'http://127.0.0.1:8000'
 
 const store = new Vuex.Store({
-  plugins: [createPersistedState()],
+  plugins: [
+    createPersistedState({
+      // session storage에 저장
+      storage: window.sessionStorage,
+      // 해당 내용은 굳이 저장할 필요 없음
+      blackList: ['posts', 'movie', 'users'],
+    }),
+  ],
 
   state: {
+    // 로컬 Django 서버 주소
+    API_URL: 'http://127.0.0.1:8000',
+    darkMode: false,
+
     token: null,
     user: null,
     posts: [],
     movie: null,
-    // isVoted: false,
+    showLoginModal: false,
+    showSignUpModal: false,
+    showUsersModal: false,
+    users: [],
   },
   getters: {
     isLogin(state) {
@@ -30,12 +50,15 @@ const store = new Vuex.Store({
     // 회원가입 && 로그인
     SAVE_TOKEN(state, token) {
       state.token = token
-      router.push({ name: 'index' })
     },
     GET_USER_INFO(state, userInfo) {
       state.user = userInfo
     },
     LOG_OUT(state) {
+      state.token = null
+      state.user = null
+    },
+    WITHDRAW(state) {
       state.token = null
       state.user = null
     },
@@ -46,12 +69,27 @@ const store = new Vuex.Store({
     GET_MOVIE(state, movie) {
       state.movie = movie
     },
+    TOGGLE_LOGIN_MODAL(state, boolean) {
+      state.showLoginModal = boolean
+    },
+    TOGGLE_SIGNUP_MODAL(state, boolean) {
+      state.showSignUpModal = boolean
+    },
+    TOGGLE_USERS_MODAL(state, boolean) {
+      state.showUsersModal = boolean
+    },
+    SAVE_USERS(state, users) {
+      state.users = users
+    },
+    TOGGLE_DARK_MODE(state, boolean) {
+      state.darkMode = boolean
+    },
   },
   actions: {
     signUp(context, payload) {
       axios({
         method: 'post',
-        url: `${API_URL}/accounts/signup/`,
+        url: `${context.state.API_URL}/accounts/signup/`,
         data: {
           username: payload.username,
           password1: payload.password1,
@@ -66,28 +104,10 @@ const store = new Vuex.Store({
           console.log(err)
         })
     },
-    logIn(context, payload) {
-      axios({
-        method: 'post',
-        url: `${API_URL}/accounts/login/`,
-        data: {
-          username: payload.username,
-          password: payload.password,
-        },
-      })
-        .then((res) => {
-          console.log(res)
-          context.commit('SAVE_TOKEN', res.data.key)
-          context.dispatch('getUserInfo')
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    },
     logOut(context) {
       axios({
         method: 'post',
-        url: `${API_URL}/accounts/logout/`,
+        url: `${context.state.API_URL}/accounts/logout/`,
         headers: {
           Authorization: `Token ${context.state.token}`,
         },
@@ -103,7 +123,7 @@ const store = new Vuex.Store({
     getUserInfo(context) {
       axios({
         method: 'get',
-        url: `${API_URL}/accounts/user/`,
+        url: `${context.state.API_URL}/accounts/user/`,
         headers: {
           Authorization: `Token ${context.state.token}`,
         },
@@ -125,7 +145,7 @@ const store = new Vuex.Store({
     getPosts(context) {
       axios({
         method: 'get',
-        url: `${API_URL}/community/posts/`,
+        url: `${context.state.API_URL}/community/posts/`,
       })
         .then((res) => {
           context.commit('GET_POSTS', res.data)
@@ -135,24 +155,38 @@ const store = new Vuex.Store({
         })
     },
     getMovie(context, movieId) {
-      axios({
-        method: 'get',
-        url: `${API_URL}/movies/${movieId}/`,
-      })
-        .then((res) => {
-          console.log(res)
-          const movie = res.data
-          if (movie.like_users.includes(context.state.user?.id)) {
-            movie.isLiked = true
-          } else {
-            movie.isLiked = false
-          }
-          context.commit('GET_MOVIE', movie)
+      if (context.getters.isLogin) {
+        axios({
+          method: 'get',
+          url: `${context.state.API_URL}/movies/${movieId}/`,
+          headers: {
+            Authorization: `Token ${context.state.token}`,
+          },
         })
-        .catch((err) => {
-          router.push({ name: 'NotFound404' })
-          console.log(err)
+          .then((res) => {
+            console.log(res)
+            const movie = res.data
+            context.commit('GET_MOVIE', movie)
+          })
+          .catch((err) => {
+            router.push({ name: 'NotFound404' })
+            console.log(err)
+          })
+      } else {
+        axios({
+          method: 'get',
+          url: `${context.state.API_URL}/movies/${movieId}/unlogin/`,
         })
+          .then((res) => {
+            console.log(res)
+            const movie = res.data
+            context.commit('GET_MOVIE', movie)
+          })
+          .catch((err) => {
+            router.push({ name: 'NotFound404' })
+            console.log(err)
+          })
+      }
     },
   },
 })

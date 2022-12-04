@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <canvas id="myChart" width="500" height="400"></canvas>
+  <div class="p-3" :class="darkMode ? 'box-dark' : 'box-light'">
+    <h5 class="fw-bold">지난주 TOP5 일별 관객수</h5>
+    <canvas class="ps-3 pe-3" id="myChart" width="100%"></canvas>
   </div>
 </template>
 
@@ -8,23 +9,30 @@
 import Chart from 'chart.js'
 import axios from 'axios'
 
-const API = 'http://127.0.0.1:8000'
+// const API_URL = 'https://boogiee.site'
 
 export default {
   name: 'BoxOffice',
   data() {
     return {
       datasets: null,
-      colors: ['#CC0000', '#3366FF', '#33CC33', '#FF6600', '#FFFF66'],
+      colors: ['#141060', '#70558e', '#7173c9', '#df94c2', '#ffbdc1'],
     }
   },
-  methods: {},
+  computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
+    darkMode() {
+      return this.$store.state.darkMode
+    },
+  },
   mounted() {
     const ctx = document.getElementById('myChart')
 
     axios({
       method: 'get',
-      url: `${API}/movies/boxoffice/`,
+      url: `${this.API_URL}/movies/boxoffice/`,
     })
       .then((res) => {
         const datasets = res.data
@@ -51,8 +59,8 @@ export default {
           options: {
             responsive: true,
             title: {
-              display: true,
-              text: '주간 인기 영화',
+              display: false,
+              text: '지난주 Top5 일별관객수',
             },
             tooltips: {
               mode: 'index',
@@ -67,6 +75,26 @@ export default {
                 type: 'linear',
                 suggestedMin: 0,
                 suggestedMax: 1000000,
+              },
+              yAxes: [
+                {
+                  ticks: {
+                    fontColor: this.darkMode ? '#d4d4d4' : '#353535',
+                  },
+                },
+              ],
+              xAxes: [
+                {
+                  ticks: {
+                    fontColor: this.darkMode ? '#d4d4d4' : '#353535',
+                  },
+                },
+              ],
+            },
+            legend: {
+              labels: {
+                fontColor: this.darkMode ? '#d4d4d4' : '#535353',
+                fontSize: 12,
               },
             },
           },

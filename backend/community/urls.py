@@ -5,6 +5,7 @@ urlpatterns = [
     path('posts/', views.post_list),
     path('posts/hot/', views.post_list_hot),
     path('posts/<int:post_pk>/', views.post_detail),
+    path('posts/<int:post_pk>/unlogin/', views.post_detail_unlogin),
     path('posts/<int:post_pk>/like/', views.post_like),
     path('posts/<int:post_pk>/comments/', views.comment_list),
     path('posts/<int:post_pk>/comments/<int:comment_pk>/', views.

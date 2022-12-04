@@ -1,15 +1,33 @@
 <template>
-  <div style="width: 100px">
-    <img :src="profileUrl" style="width: 100%" />
-    <input type="file" accept="image/*" v-model="profileImage" />
-    <button @click="uploadProfile">변경</button>
+  <div class="d-flex flex-column align-items-center">
+    <div class="d-flex">
+      <div id="profile-box">
+        <img :src="profileUrl" style="width: 100%" />
+      </div>
+      <div
+        v-if="person?.id === user?.id"
+        class="delete align-self-end"
+        @click="deleteProfile"
+      >
+        <img :src="require('@/assets/trashcan.png')" alt="" />
+      </div>
+    </div>
+    <div class="mt-3">
+      <input
+        v-if="person?.id === user?.id"
+        style="width: 200px"
+        type="file"
+        accept="image/*"
+        @change="uploadProfile"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 
-const API_URL = 'http://127.0.0.1:8000'
+// const API_URL = "https://boogiee.site"
 
 export default {
   name: 'ProfileImage',
@@ -17,21 +35,47 @@ export default {
     person: Object,
   },
   computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
+    user() {
+      return this.$store.state.user
+    },
     profileUrl() {
-      return `${API_URL}${this.person.profile_image.profile_image}`
+      return `${this.$store.state.API_URL}${this.person.profile_image}`
     },
   },
   methods: {
     uploadProfile(event) {
+      if (!event.target.files.length) {
+        return
+      }
       const files = new FormData()
       files.append('profile_image', event.target.files[0])
 
       axios({
         method: 'put',
-        url: `${API_URL}/users/${this.person.id}/profile/`,
+        url: `${this.API_URL}/users/${this.person.id}/profile/`,
         data: files,
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: `Token ${this.$store.state.token}`,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          const profileImage = res.data.profile_image
+          this.$emit('change_profile', profileImage)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    deleteProfile() {
+      axios({
+        method: 'delete',
+        url: `${this.API_URL}/users/${this.person.id}/profile/`,
+        headers: {
           Authorization: `Token ${this.$store.state.token}`,
         },
       })
@@ -48,4 +92,21 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+#profile-box {
+  width: 200px;
+  height: 200px;
+  border-radius: 70%;
+  overflow: hidden;
+}
+.delete {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.delete img {
+  width: 100%;
+  filter: opacity(0.6) drop-shadow(0 0 0 white);
+}
+</style>

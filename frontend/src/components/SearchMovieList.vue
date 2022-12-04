@@ -1,10 +1,12 @@
 <template>
-  <div>
-    <SearchMovieListItem
-      v-for="(movie, index) in searchMovies"
-      :key="index"
-      :movie="movie"
-    />
+  <div class="p-3">
+    <h5 class="fw-bold">영화 검색결과</h5>
+    <div class="mt-3 mb-2">
+      <SearchMovieListItem
+        v-for="(movie, index) in searchMovies"
+        :key="index"
+        :movie="movie" />
+    </div>
   </div>
 </template>
 
@@ -22,23 +24,27 @@ export default {
       searchMovies: [],
     }
   },
+  computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
+  },
+  watch: {
+    $route() {
+      this.getSearchMovies()
+    },
+  },
   created() {
     this.getSearchMovies()
   },
   methods: {
     getSearchMovies() {
-      const params = {
-        api_key: '6f44898888940b2a302f0cdbee081d68',
-        language: 'ko-KO',
-        query: this.$route.params.query,
-      }
-
       axios({
         method: 'get',
-        url: 'https://api.themoviedb.org/3/search/movie',
-        params,
+        url: `${this.API_URL}/movies/${this.$route.params.query}/tmdb/`,
       })
         .then((res) => {
+          console.log(res)
           this.searchMovies = res.data.results.slice(0, 5)
         })
         .catch((err) => {

@@ -1,74 +1,109 @@
 <template>
   <div>
-    <h1>Profile</h1>
     <div v-if="person">
-      <ProfileBackdrop :person="person" @change_backdrop="changeBackdrop" />
-      <ProfileImage :person="person" @change_profile="changeProfile" />
-      <div>
-        <p>{{ person?.username }}</p>
-        <p>가입일: {{ dateJoined }}</p>
-        <p>점수: {{ person?.score }}점</p>
-        <!-- <p>팔로잉: {{ person?.followings.length }}명</p> -->
-        <!-- <p>팔로워: {{ person?.followers.length }}명</p> -->
-        <div v-if="person?.id !== user?.id" @click="follow">
-          <button
-            type="button"
-            :class="{
-              btn: true,
-              'btn-outline-primary': !isFollowed,
-              'btn-outline-secondary': isFollowed,
-            }"
-          >
-            {{ isFollowed ? '팔로잉 취소' : '팔로우' }}
-          </button>
-          <p>
-            선호장르
-            <span v-if="genrePreference?.length >= 1">{{
-              genrePreference[0][0]
-            }}</span>
-            <span v-if="genrePreference?.length >= 2">{{
-              genrePreference[1][0]
-            }}</span>
-            <span v-if="genrePreference?.length >= 3">{{
-              genrePreference[2][0]
-            }}</span>
-          </p>
+      <!-- <ProfileBackdrop :person="person" @change_backdrop="changeBackdrop" /> -->
+      <div
+        class="profile-header d-flex align-items-end justify-content-center"
+        :style="{
+          backgroundImage: `url(${backdropUrl})`,
+        }">
+        <div class="d-flex profile-info p-4 mb-3">
+          <ProfileImage :person="person" @change_profile="changeProfile" />
+          <div class="ms-5">
+            <h4 class="fw-bold mt-3">{{ person?.username }}님의 프로필</h4>
+            <p class="mt-4">가입일: {{ dateJoined }}</p>
+            <p>점수: {{ person?.score }}점</p>
+            <p>
+              <span v-if="this.person?.genre_preference.length >= 1"
+                >{{ this.person?.genre_preference[0]['genre'] }}
+              </span>
+              <span v-if="this.person?.genre_preference.length >= 2">
+                | {{ this.person?.genre_preference[1]['genre'] }}
+              </span>
+              <span v-if="this.person?.genre_preference.length >= 3">
+                | {{ this.person?.genre_preference[2]['genre'] }}</span
+              >
+            </p>
+            <p
+              class="fw-bold"
+              style="cursor: pointer"
+              @click="$store.commit('TOGGLE_USERS_MODAL', true)">
+              <span @click="$store.commit('SAVE_USERS', person?.followings)"
+                >팔로잉: {{ person?.followings.length }}명 /
+              </span>
+              <span @click="$store.commit('SAVE_USERS', person?.followers)"
+                >팔로워: {{ person?.followers.length }}명</span
+              >
+            </p>
+            <div v-if="person?.id == user?.id" @click="withdraw">
+              <button type="button" class="btn btn-outline-danger">
+                회원탈퇴
+              </button>
+            </div>
+            <div v-if="person?.id !== user?.id" @click="follow">
+              <button
+                type="button"
+                :class="{
+                  btn: true,
+                  'btn-outline-primary': !person.is_followed,
+                  'btn-outline-secondary': person.is_followed,
+                }">
+                {{ person?.is_followed ? 'Unfollow' : 'Follow' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-if="person?.id === user?.id" class="backdrop-input-delete">
+          <input
+            style="width: 200px"
+            type="file"
+            accept="image/*"
+            @change="uploadBackdrop" />
+          <div class="delete d-inline-block ms-3" @click="deleteBackdrop">
+            <img :src="require('@/assets/trashcan.png')" alt="" />
+          </div>
         </div>
       </div>
-      <ProfileMovieList :likeMovies="person.like_movies" />
-      <ProfileReviewList :myReviews="person.my_reviews" />
-      <ProfilePostList :postTitle="'내가 작성한 글'" :post="person.my_posts" />
-      <ProfilePostList :postTitle="'글'" :post="person.like_posts" />
+      <div class="col-11 col-lg-8 mx-auto" style="max-width: 1200px">
+        <ProfileMovieList class="mt-3" :likeMovies="person.like_movies" />
+        <ProfileLikePostList class="mt-3" :posts="person.like_posts" />
+        <ProfileReviewList class="mt-3" :myReviews="person.my_reviews" />
+        <ProfilePostList class="mt-3" :posts="person.my_posts" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import ProfileBackdrop from '@/components/ProfileBackdrop.vue'
+// import ProfileBackdrop from '@/components/ProfileBackdrop.vue'
 import ProfileImage from '@/components/ProfileImage.vue'
 import ProfileMovieList from '@/components/ProfileMovieList.vue'
 import ProfileReviewList from '@/components/ProfileReviewList.vue'
+import ProfileLikePostList from '@/components/ProfileLikePostList.vue'
 import ProfilePostList from '@/components/ProfilePostList.vue'
 import axios from 'axios'
 
-const API_URL = 'http://127.0.0.1:8000'
+// const API_URL = 'https://boogiee.site'
 
 export default {
   name: 'ProfileView',
   components: {
     ProfileImage,
-    ProfileBackdrop,
+    // ProfileBackdrop,
     ProfileMovieList,
     ProfileReviewList,
     ProfilePostList,
+    ProfileLikePostList,
   },
   data() {
     return {
       person: null,
-      isFollowed: false,
     }
   },
   computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
     user() {
       return this.$store.state.user
     },
@@ -78,14 +113,8 @@ export default {
     dateJoined() {
       return new Date(this.person?.date_joined).toLocaleDateString()
     },
-    genrePreference() {
-      if (this.person?.genre_preference) {
-        return Object.entries(this.person?.genre_preference).sort(
-          (a, b) => b[1] - a[1]
-        )
-      } else {
-        return []
-      }
+    backdropUrl() {
+      return `${this.$store.state.API_URL}${this.person.backdrop_image}`
     },
   },
   created() {
@@ -95,20 +124,15 @@ export default {
     getPerson(username) {
       axios({
         method: 'get',
-        url: `${API_URL}/users/${username}/`,
-        // headers: {
-        //   Authorization: `Token ${this.$store.state.token}`,
-        // },
+        url: `${this.API_URL}/users/${username}/`,
+        headers: {
+          Authorization: `Token ${this.$store.state.token}`,
+        },
       })
         .then((res) => {
           console.log(res)
           const person = res.data
           this.person = person
-          if (person.followers.includes(this.user?.id)) {
-            this.isFollowed = true
-          } else {
-            this.isFollowed = false
-          }
         })
         .catch((err) => {
           console.log(err)
@@ -121,7 +145,7 @@ export default {
       }
       axios({
         method: 'post',
-        url: `${API_URL}/users/${this.person.id}/follow/`,
+        url: `${this.API_URL}/users/${this.person.id}/follow/`,
         headers: {
           Authorization: `Token ${this.$store.state.token}`,
         },
@@ -129,7 +153,7 @@ export default {
         .then((res) => {
           console.log(res)
           const isFollowed = res.data.is_followed
-          this.isFollowed = isFollowed
+          this.person.is_followed = isFollowed
           if (isFollowed) {
             this.person.followers.length += 1
           } else {
@@ -141,11 +165,64 @@ export default {
         })
     },
     changeProfile(profileImage) {
-      this.person.profile_image.profile_image = profileImage
+      this.person.profile_image = profileImage
     },
-    changeBackdrop(backdropImage) {
-      console.log(backdropImage)
-      this.person.backdrop_image.backdrop_image = backdropImage
+    uploadBackdrop(event) {
+      if (!event.target.files.length) {
+        return
+      }
+      const files = new FormData()
+      files.append('backdrop_image', event.target.files[0])
+
+      axios({
+        method: 'put',
+        url: `${this.API_URL}/users/${this.person.id}/backdrop/`,
+        data: files,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Token ${this.$store.state.token}`,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.person.backdrop_image = res.data.backdrop_image
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    deleteBackdrop() {
+      axios({
+        method: 'delete',
+        url: `${this.API_URL}/users/${this.person.id}/backdrop/`,
+        headers: {
+          Authorization: `Token ${this.$store.state.token}`,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.person.backdrop_image = res.data.backdrop_image
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    withdraw() {
+      axios({
+        method: 'delete',
+        url: `${this.API_URL}/users/${this.user.id}/withdraw/`,
+        headers: {
+          Authorization: `Token ${this.$store.state.token}`,
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.$store.commit('WITHDRAW')
+          this.$router.push({ name: 'index' })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
   },
   beforeRouteUpdate(to, from, next) {
@@ -155,4 +232,32 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+.profile-header {
+  position: relative;
+  height: 500px;
+  background-size: cover;
+}
+
+.profile-info {
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.61);
+}
+
+.delete {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.delete img {
+  width: 100%;
+  filter: opacity(0.8) drop-shadow(0 0 0 white);
+}
+
+.backdrop-input-delete {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+</style>

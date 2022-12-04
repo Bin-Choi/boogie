@@ -4,6 +4,52 @@
 
 - https://boogiee-site.netlify.app/
 
+배포서버는 22년 12월 기준으로 약 6개월 가량 유지할 **계획**입니다. 만일 서버 접속이 원할하지 않을 경우, 본 프로젝트를 clone하여 로컬 서버로 간이 구동이 가능합니다.
+
+**로컬 서버 구동 절차**  
+로컬서버는 데이터베이스가 제한되어 있으며, api_key를 입력하지 않을 시 기능 사용이 제한적입니다. (api_key 입력 위치: backend/movies/views.py)
+
+1. 프로젝트 clone
+2. backend django 서버 구동
+
+   ```js
+   // 백엔드 폴더 이동
+   cd backend
+
+   // 가상환경 생성
+   python -m venv venv
+
+   // 가상환경 실행 (Window 기준 명령어)
+   source venv/Scripts/activate
+
+   // 패키지 설치
+   pip install -r requirements.txt
+
+   // db생성
+   python manage.py migarte
+
+   // json 파일 db 업로드 (간이 db이기 때문에 대부분의 파일이 비어있습니다.)
+   python manage.py loaddata actors.json boxoffices.json comments.json directors.json genres.json movies.json nowmovies.json posts.json users.json reviews.json
+
+   // 로컬 서버 구동
+   python manage.py runserver
+   ```
+
+3. frontend vue 서버 구동
+
+   ```js
+     // 프론트엔드 폴더 이동
+     cd frontend
+
+     // 아래 절차 전에 node.js가 미리 설치되어 있어야 합니다.
+
+     // 패키지 설치
+     npm install
+
+     // 로컬 서버 구동 (Local/Network 아무거나 선택)
+     npm run serve
+   ```
+
 # 1. 프로젝트 개요
 
 본 프로젝트의 목표는 **영화 추천 기능**을 포함하는 영화 **커뮤니티 사이트** 개발이며, 다음과 같은 특징을 가지고 있습니다.
@@ -458,7 +504,7 @@ def movie_list_recommend(request):
 
 **Django 서버 주소**
 
-- https://boogiee.site
+- 비공개
 
 ## 6.1. 배포 과정 중 어려웠던 점
 

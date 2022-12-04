@@ -1,3 +1,4 @@
+# rest_framework
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -8,15 +9,36 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from django.db.models import Q
 
-from .serializers import MovieListSerializer, MovieSerializer, ReviewSerializer, NowMovieSerializer, BoxOfficeSerializer
+from accounts.serializers import UserPreferenceSerializer
+from .serializers import MovieListSerializer, MovieSerializer, ReviewSerializer, NowMovieSerializer, BoxOfficeSerializer, MovieListGenreSerializer
 from .models import Movie, Actor, Genre, Director, Review, NowMovie, BoxOffice
-import requests
+
 from datetime import datetime ,timedelta
+import requests
+
+# 로컬 서버 구동 시, 아래 값을 채워 넣어야 합니다.
+tmdb_api_key = None
+youtube_api_key = None
+X_Naver_Client_Id = None
+X_Naver_Client_Secret = None
 
 # Create your views here.
 @api_view(['GET'])
+def movie_detail_unlogin(request, movie_pk):
+    try:
+        # movie = Movie.objects.get(pk=movie_pk)
+        movie = Movie.objects.prefetch_related('actors', 'directors', 'genres', 'like_users').get(pk=movie_pk)
+    except Movie.DoesNotExist:
+        save_movie(movie_pk)
+        movie = Movie.objects.prefetch_related('actors', 'directors', 'genres', 'like_users').get(pk=movie_pk)
+    serializer = MovieSerializer(movie)
+    data = serializer.data
+    data['is_liked'] = False
+    return Response(data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def movie_detail(request, movie_pk):
     try:
         # movie = Movie.objects.get(pk=movie_pk)
@@ -25,19 +47,43 @@ def movie_detail(request, movie_pk):
         save_movie(movie_pk)
         movie = Movie.objects.prefetch_related('actors', 'directors', 'genres', 'like_users').get(pk=movie_pk)
     serializer = MovieSerializer(movie)
-    return Response(serializer.data)
+    if movie.like_users.filter(pk=request.user.pk).exists():
+        is_liked = True
+    else:
+        is_liked = False
+    data = serializer.data
+    data['is_liked'] = is_liked
+    return Response(data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def movie_like(request, movie_pk):
-    movie = get_object_or_404(Movie, pk=movie_pk)
+    movie = Movie.objects.prefetch_related('genres').get(pk=movie_pk)
+    # 장르 선호도 업데이트를 위한 준비
+    user = get_user_model().objects.get(pk=request.user.pk)
+    original_data = UserPreferenceSerializer(user).data
+    genres = movie.genres.all()
 
     if movie.like_users.filter(pk=request.user.pk).exists():
         movie.like_users.remove(request.user)
         is_liked = False
+        # 유저의 장르선호도 업데이트
+        for genre in genres:
+            g = Genre.objects.get(pk=genre.id)
+            original_data[g.field_name] -= 1
+        updated_serializer = UserPreferenceSerializer(user, data=original_data)
+        if updated_serializer.is_valid(raise_exception=True):
+            updated_serializer.save()
     else:
         movie.like_users.add(request.user)
         is_liked = True
+        # 유저의 장르선호도 업데이트
+        for genre in genres:
+            g = Genre.objects.get(pk=genre.id)
+            original_data[g.field_name] += 1
+        updated_serializer = UserPreferenceSerializer(user, data=original_data)
+        if updated_serializer.is_valid(raise_exception=True):
+            updated_serializer.save()
     context = {
         'is_liked': is_liked,
     }
@@ -46,6 +92,7 @@ def movie_like(request, movie_pk):
 @api_view(['GET', 'POST'])
 def review_list_movie(request, movie_pk):
     movie=Movie.objects.get(pk=movie_pk)
+
     if request.method == 'GET':
         reviews = Review.objects.filter(movie=movie).order_by('-created_at')
         serializer = ReviewSerializer(reviews, many=True)
@@ -55,7 +102,28 @@ def review_list_movie(request, movie_pk):
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(movie=movie, user=request.user)
+            # 리뷰 작성 시 점수 50점
+            user = get_user_model().objects.get(pk=request.user.pk)
+            user.score += 50
+            user.save()
+
+            # 장르 선호도 업데이트를 위한 준비
+            user = get_user_model().objects.get(pk=request.user.pk)
+            original_data = UserPreferenceSerializer(user).data
+            genres = movie.genres.all()
+
+            # 유저의 장르선호도 업데이트
+            vote = request.data['vote'] - 3
+            for genre in genres:
+                g = Genre.objects.get(pk=genre.id)
+                original_data[g.field_name] += vote
+            updated_serializer = UserPreferenceSerializer(user, data=original_data)
+            if updated_serializer.is_valid(raise_exception=True):
+                updated_serializer.save()
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -71,28 +139,84 @@ def my_review_movie(request, movie_pk):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def review_detail(request, review_pk):
+def review_detail(request, movie_pk, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
+
+    # 장르 선호도 업데이트를 위한 준비
+    movie=Movie.objects.get(pk=movie_pk)
+    user = get_user_model().objects.get(pk=request.user.pk)
+    original_data = UserPreferenceSerializer(user).data
+    genres = movie.genres.all()
 
     if request.method == 'DELETE':
         if review.user == request.user:
             review.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-            
-        # elif request.method == 'GET':
-        #     serializer = ReviewSerializer(Review)
-        #     return Response(serializer.data)
+            # 리뷰 삭제 시 점수 50점 차감
+            user = get_user_model().objects.get(pk=request.user.pk)
+            user.score -= 50
+            user.save()
 
-        # elif request.method == 'PUT':
-        #     serializer = ReviewSerializer(review, data=request.data)
-        #     if serializer.is_valid(raise_exception=True):
-        #         serializer.save()
-        #         return Response(serializer.data)
+            # 유저의 장르선호도 업데이트(원래 점수로 초기화)
+            vote = review.vote - 3
+            for genre in genres:
+                g = Genre.objects.get(pk=genre.id)
+                original_data[g.field_name] -= vote
+            updated_serializer = UserPreferenceSerializer(user, data=original_data)
+            if updated_serializer.is_valid(raise_exception=True):
+                updated_serializer.save()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['GET'])
+def movie_list_related(request, movie_pk):
+    # 기존 영화의 장르 리스트 가져오기
+    movie = Movie.objects.get(pk=movie_pk)
+    genre_list =  MovieListGenreSerializer(movie).data['genres']
+
+    # 모든 영화를 장르 리스트 포함해서 가져오기
+    serializer = MovieListGenreSerializer(Movie.objects.exclude(pk=movie_pk), many=True)
+    movies = serializer.data
+
+    # 장르 적합도를 보고 점수를 매겨 sort
+    def calculate_score(movie):
+        score = 0
+        genres = movie['genres']
+        for genre in genres:
+            if genre in genre_list:
+                score += 1
+        return score
+    movies.sort(key= lambda x: calculate_score(x), reverse=True)
+
+    return Response(movies[:10])
+
+@api_view(['GET'])
+def video_list(request, movie_title):
+    url = f'https://www.googleapis.com/youtube/v3/search'
+    params = {
+        'key': youtube_api_key,
+        'part': 'id',
+        'type': 'video',
+        'maxResults': 5,
+        'q': movie_title + ' 예고편',
+    }
+    response = requests.get(url, params=params)
+    return Response(response.json())
+
+@api_view(['GET'])
+def tmdb_movie_list(request, query):
+    url = f'https://api.themoviedb.org/3/search/movie'
+    params = {
+        'api_key': tmdb_api_key,
+        'language': 'ko-KO',
+        'query': query,
+    }
+    response = requests.get(url, params=params)
+    return Response(response.json())
+
+@api_view(['GET'])
 def review_list_recent(request):
-    recent_reviews = Review.objects.all().order_by('created_at')[:5]
+    recent_reviews = Review.objects.all().order_by('-created_at')[:5]
 
     serializer = ReviewSerializer(recent_reviews, many=True)
     print(type(serializer.data))
@@ -103,7 +227,6 @@ def movie_list_now(request):
     now_show = NowMovie.objects.all()
     serializer = NowMovieSerializer(now_show, many=True)
     return Response(serializer.data)
-     
 
 @api_view(['GET'])     
 def boxoffice(request):
@@ -132,127 +255,130 @@ def boxoffice(request):
         chart_data.append({"label":title, "data":data[title]})
     
     return Response(chart_data)
-#######################################################
 
 
 @api_view(['GET'])
 def search_naver(request, query):
-
     url = f'https://openapi.naver.com/v1/search/blog.json?query={query}'
     headers = {
     'Accept': 'application/json',
-    'X-Naver-Client-Id': 'NNHX_cQDFZBEfGfHAKSj',
-    'X-Naver-Client-Secret': 'IFlMhWdiIZ'
+    'X-Naver-Client-Id': X_Naver_Client_Id,
+    'X-Naver-Client-Secret': X_Naver_Client_Secret,
     }
     response = requests.get(url, headers= headers)
     return Response(response.json())
 
-
-
-######################################################3
+@api_view(['GET'])
+def movie_list_recommend_unlogin(request):
+    movies = Movie.objects.all().order_by('-vote_average')[:10]
+    serializer = MovieListSerializer(movies, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
-def movie_recommend(request):
-    movies = Movie.objects.prefetch_related('genres').all()
+@permission_classes([IsAuthenticated])
+def movie_list_recommend(request):
+    # 유저의 장르 선호도 가져오기
+    user = get_user_model().objects.get(pk=request.user.pk)
+    genre_preference = UserPreferenceSerializer(user).data
 
-    for movie in movies:
-        print(movie.genres.all().name)
+    # 모든 영화를 장르 리스트 포함해서 가져오기
+    serializer = MovieListGenreSerializer(Movie.objects.all(), many=True)
+    movies = serializer.data
 
-    return Response({'data': 'data'})
+    # 선호도별 점수를 매겨 sort
+    id_to_field_name = {12:	'adventure', 14: 'fantasy', 16:	'animation', 18	: 'drama', 27: 'horror', 28: 'action', 35: 'comedy', 36: 'history', 37:	'western', 53: 'thriller', 80: 'crime', 99: 'documentary', 878: 'science_fiction', 9648	: 'mystery', 10402: 'music', 10749: 'romance', 10751: 'family', 10752: 'war', 10770: 'tv_movie',}
+    def calculate_score(movie):
+        score = 0
+        genres = movie['genres']
+        for genre in genres:
+            # field_name = Genre.objects.get(id=genre).field_name
+            field_name = id_to_field_name[genre]
+            score += genre_preference[field_name]
+        return score
+    movies.sort(key= lambda x: calculate_score(x), reverse=True)
 
-
-######################################################3
-@api_view(['GET'])
-def review_list_user(request, user_pk):
-    user = get_object_or_404(get_user_model(), pk=user_pk)
-
-    if request.method == 'GET':
-        reviews = Review.objects.filter(user=user)
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
-
-@api_view(['GET'])
-def review_list_recent(request):
-
-    if request.method == 'GET':
-        reviews = Review.objects.all().order_by('created_at')[:10]
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
+    return Response(movies[:10])
 
 ######################################################3
 
 def save_movie(id):
-    m = Movie()
+    try:
+        Movie.objects.get(id=id)
+        return
+
+    except:
+        m = Movie()
     
-    url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO'
-    response = requests.get(url_detail)
-    movie_detail = response.json()  # <class 'dict'>: {}
+        url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key={tmdb_api_key}&language=ko-KO'
+        response = requests.get(url_detail)
+        movie_detail = response.json()  # <class 'dict'>: {}
 
-    m.id = movie_detail.get('id')
-    m.title = movie_detail.get('title')
-    m.release_date = movie_detail.get('release_date')
-    m.country = movie_detail.get('production_countries')[0].get('name')
-    m.vote_count = movie_detail.get('vote_count')
-    m.vote_average = movie_detail.get('vote_average')
-    if movie_detail.get('overview'):
-        m.overview = movie_detail.get('overview')
-    else:
-        m.overview = ''
-    if movie_detail.get('poster_path'):
-        m.poster_path = movie_detail.get('poster_path')
-    else:
-        m.poster_path = ''
-    if movie_detail.get('backdrop_path'):
-        m.backdrop_path = movie_detail.get('backdrop_path')
-    else:
-        m.backdrop_path = ''
+        m.id = movie_detail.get('id')
+        m.title = movie_detail.get('title')
+        m.release_date = movie_detail.get('release_date')
+        if movie_detail.get('production_countries'):
+            m.country = movie_detail.get('production_countries')[0].get('name')
+        m.vote_count = movie_detail.get('vote_count')
+        m.vote_average = movie_detail.get('vote_average')
+        if movie_detail.get('overview'):
+            m.overview = movie_detail.get('overview')
+        else:
+            m.overview = ''
+        if movie_detail.get('poster_path'):
+            m.poster_path = movie_detail.get('poster_path')
+        else:
+            m.poster_path = ''
+        if movie_detail.get('backdrop_path'):
+            m.backdrop_path = movie_detail.get('backdrop_path')
+        else:
+            m.backdrop_path = ''
 
-    m.save()
-    m = Movie.objects.get(id=id)
+        m.save()
+        m = Movie.objects.get(id=id)
 
-    genres = movie_detail.get('genres')
-    for genre in genres:
-        # print(genre)
-        m.genres.add(Genre.objects.get(id=genre['id']))
-    
-    url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO'
-    response = requests.get(url_credits)
-    movie_credits = response.json() # <class 'dict'>
+        genres = movie_detail.get('genres')
+        for genre in genres:
+            # print(genre)
+            m.genres.add(Genre.objects.get(id=genre['id']))
+        
+        url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key={tmdb_api_key}&language=ko-KO'
+        response = requests.get(url_credits)
+        movie_credits = response.json() # <class 'dict'>
 
-    casts = movie_credits['cast']
+        casts = movie_credits['cast']
 
-    for cast in casts[:10]:
-        try: 
-            a = Actor.objects.get(id=cast.get('id'))
-        except:
-            if cast.get('profile_path'):
-                a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path=cast.get('profile_path'))
-            else:
-                a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path='')
-        m.actors.add(a)
+        for cast in casts[:10]:
+            try: 
+                a = Actor.objects.get(id=cast.get('id'))
+            except:
+                if cast.get('profile_path'):
+                    a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path=cast.get('profile_path'))
+                else:
+                    a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path='')
+            m.actors.add(a)
 
-    directors = []
-    crews = movie_credits['crew']
-    for crew in crews:
-        if crew['job'] == "Director":
-            directors.append(crew)
+        directors = []
+        crews = movie_credits['crew']
+        for crew in crews:
+            if crew['job'] == "Director":
+                directors.append(crew)
 
-    for director in directors:
-        try: 
-            d = Director.objects.get(id=director.get('id'))
-        except:
-            if director.get('profile_path'):
-                d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path=director.get('profile_path'))
-            else:
-                d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path='')
+        for director in directors:
+            try: 
+                d = Director.objects.get(id=director.get('id'))
+            except:
+                if director.get('profile_path'):
+                    d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path=director.get('profile_path'))
+                else:
+                    d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path='')
 
-        m.directors.add(d)
+            m.directors.add(d)
 
 def fill_movie_now_every_day():
     fill_movie_now()
 
 def fill_movie_now():
-    url = f'https://api.themoviedb.org/3/movie/now_playing?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO&page=1&region=KR'
+    url = f'https://api.themoviedb.org/3/movie/now_playing?api_key={tmdb_api_key}&language=ko-KO&page=1&region=KR'
     response = requests.get(url)
     show_dict = response.json()
 
@@ -261,6 +387,7 @@ def fill_movie_now():
         movie.delete()
     
     for movie in show_dict.get("results")[:10]:
+        save_movie(movie['id']) # 데이터베이스에도 저장
         NowMovie.objects.create(id = movie['id'], title= movie["title"], vote_average = movie["vote_average"], poster_path = movie["poster_path"])
    
 def fill_boxoffice_every_week():
@@ -274,7 +401,7 @@ def fill_boxoffice():
     
     # 주간 박스오피스 요청 보내서 5개를 영화제목, 관객수, day=-1로 저장
     date = (datetime.now()-timedelta(days=7)).strftime('%Y%m%d')
-    url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key=128fedfc5557dcb90bba94cf5beff443&targetDt={date}&weekGb=0&itemPerPage=5'
+    url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={tmdb_api_key}&targetDt={date}&weekGb=0&itemPerPage=5'
     response = requests.get(url)
     boxoffice_dict = response.json()
             
@@ -285,7 +412,7 @@ def fill_boxoffice():
     for day_dif in range(7, 0, -1):
         date = (datetime.now()-timedelta(days=day_dif)).strftime('%Y%m%d')
         
-        url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=128fedfc5557dcb90bba94cf5beff443&targetDt={date}&itemPerPage=10'
+        url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key={tmdb_api_key}&targetDt={date}&itemPerPage=10'
         response = requests.get(url)
         boxoffice_dict = response.json()
             
@@ -293,97 +420,114 @@ def fill_boxoffice():
             BoxOffice.objects.create(title= movie['movieNm'], audi_cnt = movie['audiCnt'], day=7-day_dif)
      
 
-# def fill_data(request):
-#     # genres
-#     url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO'
+#################### Step2. Step1의 genre 채우는 거 실행한 다음에 한번만 더 실행에서 영어이름 채워줌############################
+# def fill_genre_field_name(request):
+#     url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key={tmdb_api_key}&language=en-EN'
 #     response = requests.get(url_genre)  # <class 'requests.models.Response'>: <Response [200]>
 #     genres_dict = response.json()        # <class 'dict'>: {'genres': [{'id', 'name'}]}
 #     genres= genres_dict['genres']
 
 #     for genre in genres:
-#         try: 
-#             Genre.objects.get(id=genre.get('id'))
-#         except:
-#             Genre.objects.create(id=genre.get('id'), name=genre.get('name'))
-
-#     url = 'https://api.themoviedb.org/3/movie/top_rated?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO&page=1&region=KR'
-#     response = requests.get(url)
-#     movie_dict = response.json()        # <class 'dict'>: {'page': 1, 'results': [{}]}
-#     movies = movie_dict['results']
-
-#     for movie in movies:
-
-#         id = movie.get('id')
-
-#         try:
-#             Movie.objects.get(id=id)
-#             continue
-
-#         except:
-#             m = Movie()
-            
-#             url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO'
-#             response = requests.get(url_detail)
-#             movie_detail = response.json()  # <class 'dict'>: {}
-
-#             m.id = movie_detail.get('id')
-#             m.title = movie_detail.get('title')
-#             m.release_date = movie_detail.get('release_date')
-#             m.country = movie_detail.get('production_countries')[0].get('name')
-#             m.vote_count = movie_detail.get('vote_count')
-#             m.vote_average = movie_detail.get('vote_average')
-#             if movie_detail.get('overview'):
-#                 m.overview = movie_detail.get('overview')
-#             else:
-#                 m.overview = ''
-#             if movie_detail.get('poster_path'):
-#                 m.poster_path = movie_detail.get('poster_path')
-#             else:
-#                 m.poster_path = ''
-#             if movie_detail.get('backdrop_path'):
-#                 m.backdrop_path = movie_detail.get('backdrop_path')
-#             else:
-#                 m.backdrop_path = ''
+#         g = Genre.objects.get(id=genre.get('id'))
+#         g.field_name = genre.get('name').lower().replace(' ','_')
+#         g.save()
+#######################################################################################################################
 
 
-#             m.save()
-#             m = Movie.objects.get(id=id)
+# def fill_data(request):
+      #################### Step1. 이거는 한번만 실행하고 주석처리 ############################
+#     # # genres
+#     # url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key={tmdb_api_key}&language=ko-KO'
+#     # response = requests.get(url_genre)  # <class 'requests.models.Response'>: <Response [200]>
+#     # genres_dict = response.json()        # <class 'dict'>: {'genres': [{'id', 'name'}]}
+#     # genres= genres_dict['genres']
 
-#             genres = movie_detail.get('genres')
-#             for genre in genres:
-#                 # print(genre)
-#                 m.genres.add(Genre.objects.get(id=genre['id']))
-            
-#             url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key=6f44898888940b2a302f0cdbee081d68&language=ko-KO'
-#             response = requests.get(url_credits)
-#             movie_credits = response.json() # <class 'dict'>
+#     # for genre in genres:
+#     #     try: 
+#     #         Genre.objects.get(id=genre.get('id'))
+#     #     except:
+#     #         Genre.objects.create(id=genre.get('id'), name=genre.get('name'))
+      ##########################################################################################
 
-#             casts = movie_credits['cast']
+#     for page in range(5, 11):
+#         url = f'https://api.themoviedb.org/3/movie/top_rated?api_key={tmdb_api_key}&language=ko-KO&page={page}&region=KR'
+#         response = requests.get(url)
+#         movie_dict = response.json()        # <class 'dict'>: {'page': 1, 'results': [{}]}
+#         movies = movie_dict['results']
 
-#             for cast in casts[:10]:
-#                 try: 
-#                     a = Actor.objects.get(id=cast.get('id'))
-#                 except:
-#                     if cast.get('profile_path'):
-#                         a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path=cast.get('profile_path'))
-#                     else:
-#                         a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path='')
-#                 m.actors.add(a)
+#         for movie in movies:
 
-#             directors = []
-#             crews = movie_credits['crew']
-#             for crew in crews:
-#                 if crew['job'] == "Director":
-#                     directors.append(crew)
+#             id = movie.get('id')
 
-#             for director in directors:
-#                 try: 
-#                     d = Director.objects.get(id=director.get('id'))
-#                 except:
-#                     if director.get('profile_path'):
-#                         d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path=director.get('profile_path'))
-#                     else:
-#                         d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path='')
+#             try:
+#                 Movie.objects.get(id=id)
+#                 continue
 
-#                 m.directors.add(d)
+#             except:
+#                 m = Movie()
+                
+#                 url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key={tmdb_api_key}&language=ko-KO'
+#                 response = requests.get(url_detail)
+#                 movie_detail = response.json()  # <class 'dict'>: {}
+
+#                 m.id = movie_detail.get('id')
+#                 m.title = movie_detail.get('title')
+#                 m.release_date = movie_detail.get('release_date')
+#                 m.country = movie_detail.get('production_countries')[0].get('name')
+#                 m.vote_count = movie_detail.get('vote_count')
+#                 m.vote_average = movie_detail.get('vote_average')
+#                 if movie_detail.get('overview'):
+#                     m.overview = movie_detail.get('overview')
+#                 else:
+#                     m.overview = ''
+#                 if movie_detail.get('poster_path'):
+#                     m.poster_path = movie_detail.get('poster_path')
+#                 else:
+#                     m.poster_path = ''
+#                 if movie_detail.get('backdrop_path'):
+#                     m.backdrop_path = movie_detail.get('backdrop_path')
+#                 else:
+#                     m.backdrop_path = ''
+
+
+#                 m.save()
+#                 m = Movie.objects.get(id=id)
+
+#                 genres = movie_detail.get('genres')
+#                 for genre in genres:
+#                     # print(genre)
+#                     m.genres.add(Genre.objects.get(id=genre['id']))
+                
+#                 url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key={tmdb_api_key}&language=ko-KO'
+#                 response = requests.get(url_credits)
+#                 movie_credits = response.json() # <class 'dict'>
+
+#                 casts = movie_credits['cast']
+
+#                 for cast in casts[:10]:
+#                     try: 
+#                         a = Actor.objects.get(id=cast.get('id'))
+#                     except:
+#                         if cast.get('profile_path'):
+#                             a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path=cast.get('profile_path'))
+#                         else:
+#                             a = Actor.objects.create(id=cast.get('id'), name=cast.get('name'), profile_path='')
+#                     m.actors.add(a)
+
+#                 directors = []
+#                 crews = movie_credits['crew']
+#                 for crew in crews:
+#                     if crew['job'] == "Director":
+#                         directors.append(crew)
+
+#                 for director in directors:
+#                     try: 
+#                         d = Director.objects.get(id=director.get('id'))
+#                     except:
+#                         if director.get('profile_path'):
+#                             d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path=director.get('profile_path'))
+#                         else:
+#                             d = Director.objects.create(id=director.get('id'), name=director.get('name'), profile_path='')
+
+#                     m.directors.add(d)
 

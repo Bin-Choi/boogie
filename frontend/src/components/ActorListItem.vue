@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div style="cursor: pointer" @click="searchActor">
     <div id="profile_box">
       <img :src="profile_path" />
     </div>
-    <p class="fw-bold text-center">{{ actor.name }}</p>
+    <p class="text-center" style="font-size: 15px">{{ actor.name }}</p>
   </div>
 </template>
 
@@ -22,16 +22,22 @@ export default {
       }
     },
   },
+  methods: {
+    searchActor() {
+      window.open(`https://www.google.com/search?q=${this.actor.name}`)
+    },
+  },
 }
 </script>
 
-<style>
+<style scoped>
 #profile_box {
   width: 70px;
   height: 70px;
   border-radius: 70%;
   overflow: hidden;
 }
+
 #profile_box img {
   width: 100%;
   height: 100%;

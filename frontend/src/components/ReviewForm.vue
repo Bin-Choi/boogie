@@ -1,56 +1,67 @@
 <template>
   <div>
     <div v-if="!myReview" id="review_form" class="d-flex">
-      <div id="stars">
+      <div id="stars" class="pt-1 me-3 mb-2">
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(1, $event)"
           @mouseleave="uncolorStar(1, $event)"
           @click="saveScore(1, $event)"
-          style="width: 50px" />
+          style="width: 40px"
+        />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(2, $event)"
           @mouseleave="uncolorStar(2, $event)"
           @click="saveScore(2, $event)"
-          style="width: 50px" />
+          style="width: 40px"
+        />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(3, $event)"
           @mouseleave="uncolorStar(3, $event)"
           @click="saveScore(3, $event)"
-          style="width: 50px" />
+          style="width: 40px"
+        />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(4, $event)"
           @mouseleave="uncolorStar(4, $event)"
           @click="saveScore(4, $event)"
-          style="width: 50px" />
+          style="width: 40px"
+        />
         <img
           :src="grayStarPath"
           @mouseenter="colorStars(5, $event)"
           @mouseleave="uncolorStar(5, $event)"
           @click="saveScore(5, $event)"
-          style="width: 50px" />
+          style="width: 40px"
+        />
       </div>
-      <div id="review_text_form" class="ms-5">
-        <input type="text" v-model.trim="content" />
-        <button
-          type="button"
-          class="btn btn-outline-primary ms-2"
-          @click="createReview">
-          작성
-        </button>
+      <div class="mb-2">
+        <input
+          id="review_text_form"
+          type="text"
+          v-model.trim="content"
+          @keyup.enter="createReview"
+        />
+        <div class="write d-inline-block ms-3" @click="createReview">
+          <img :src="require('@/assets/write.png')" alt="" />
+        </div>
       </div>
     </div>
-    <div v-if="myReview">
-      <img :src="myReviewStarPath" style="width: 200px" />
-      <span class="fs-4 fw-bold" style="margin-left: 20px">{{
-        myReview.content
-      }}</span>
-      <button type="button" class="btn btn-danger" @click="deleteReview">
-        삭제
-      </button>
+    <div v-if="myReview" class="d-flex justify-content-between">
+      <div class="d-flex align-items-center">
+        <div style="width: 180px">
+          <img :src="myReviewStarPath" style="width: 100%" />
+        </div>
+        <div class="fs-5 fw-bold ms-3">
+          {{ myReview.content }}
+        </div>
+      </div>
+      <div class="delete d-inline-block ms-3 me-1" @click="deleteReview">
+        <img :src="require('@/assets/trashcan.png')" alt="" />
+      </div>
     </div>
   </div>
 </template>
@@ -58,7 +69,7 @@
 <script>
 import axios from 'axios'
 
-const API_URL = 'http://127.0.0.1:8000'
+// const API_URL = "https://boogiee.site"
 
 export default {
   name: 'ReviewForm',
@@ -72,6 +83,9 @@ export default {
     }
   },
   computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
     myReviewStarPath() {
       if (this.myReview) {
         return require(`@/assets/stars_${this.myReview.vote}.png`)
@@ -80,6 +94,11 @@ export default {
     },
     isLogin() {
       return this.$store.getters.isLogin
+    },
+  },
+  watch: {
+    $route() {
+      this.getMyReview()
     },
   },
   created() {
@@ -119,13 +138,12 @@ export default {
       }
       axios({
         method: 'get',
-        url: `${API_URL}/movies/${this.$route.params.movieId}/myreview/`,
+        url: `${this.API_URL}/movies/${this.$route.params.movieId}/myreview/`,
         headers: {
           Authorization: `Token ${this.$store.state.token}`,
         },
       })
         .then((res) => {
-          if (res.status === 204) return
           this.myReview = res.data
         })
         .catch((err) => {
@@ -134,14 +152,15 @@ export default {
     },
     createReview() {
       if (!this.isLogin) {
-        alert('로그인 해주세요')
+        alert('로그인을 해주세요')
+        this.$store.commit('TOGGLE_LOGIN_MODAL', true)
         return
       }
       const vote = this.vote
       const content = this.content
       axios({
         method: 'post',
-        url: `${API_URL}/movies/${this.$route.params.movieId}/reviews/`,
+        url: `${this.API_URL}/movies/${this.$route.params.movieId}/reviews/`,
         data: {
           vote,
           content,
@@ -165,7 +184,7 @@ export default {
     deleteReview() {
       axios({
         method: 'delete',
-        url: `${API_URL}/movies/reviews/${this.myReview.id}/`,
+        url: `${this.API_URL}/movies/${this.$route.params.movieId}/reviews/${this.myReview.id}/`,
         headers: {
           Authorization: `Token ${this.$store.state.token}`,
         },
@@ -181,9 +200,40 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #review_form {
   display: flex;
   flex-wrap: wrap;
+}
+
+#review_text_form {
+  width: 300px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  padding-left: 5px;
+  background-color: rgb(229, 227, 230);
+}
+
+.write {
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+}
+
+.write img {
+  width: 100%;
+  filter: opacity(0.8) drop-shadow(0 0 0 white);
+}
+
+.delete {
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.delete img {
+  width: 100%;
+  filter: opacity(0.7) drop-shadow(0 0 0 white);
 }
 </style>

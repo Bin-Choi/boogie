@@ -1,6 +1,8 @@
 <template>
   <div class="comment-list">
-    <h3>comment List</h3>
+    <div class="ms-4 my-2">
+      <p class="fw-bold" style="text-align: left; font-size: 17px">댓글 목록</p>
+    </div>
     <hr />
     <CommentListItem
       v-for="comments in orderedComments"
@@ -10,6 +12,7 @@
       @get_comments="getComments"
       @select_comment="selectComment"
       class="text-start" />
+
     <CommentForm @get_comments="getComments" />
   </div>
 </template>
@@ -19,7 +22,7 @@ import CommentListItem from '@/components/CommentListItem.vue'
 import CommentForm from '@/components/CommentForm.vue'
 import axios from 'axios'
 
-const API_URL = 'http://127.0.0.1:8000'
+// const API_URL = "https://boogiee.site"
 
 export default {
   components: { CommentListItem, CommentForm },
@@ -30,6 +33,11 @@ export default {
       selectedComment: null,
     }
   },
+  computed: {
+    API_URL() {
+      return this.$store.state.API_URL
+    },
+  },
   created() {
     this.getComments()
   },
@@ -37,7 +45,7 @@ export default {
     getComments() {
       axios({
         method: 'get',
-        url: `${API_URL}/community/posts/${this.$route.params.postId}/comments/`,
+        url: `${this.API_URL}/community/posts/${this.$route.params.postId}/comments/`,
       })
         .then((res) => {
           const comments = res.data
@@ -69,4 +77,11 @@ export default {
 }
 </script>
 
-<style></style>
+<style scoped>
+hr {
+  margin-left: 7px;
+  margin-right: 7px;
+  margin-top: 0.04rem;
+  margin-bottom: 0.04rem;
+}
+</style>

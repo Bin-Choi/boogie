@@ -34,29 +34,45 @@ const routes = [
     path: '/community/create',
     name: 'createPost',
     component: PostCreateView,
-  },
-  {
-    path: '/post/:postId/update',
-    name: 'updatePost',
-    component: PostUpdateView,
-  },
-  {
-    path: '/post/:postId',
-    name: 'postDetail',
-    component: PostDetailView,
     beforeEnter(to, from, next) {
       if (store.getters.isLogin) {
         next()
       } else {
         alert('로그인 해주세요')
-        next({ name: 'login' })
+        store.commit('TOGGLE_LOGIN_MODAL', true)
       }
     },
+  },
+  {
+    path: '/post/:postId/update',
+    name: 'updatePost',
+    component: PostUpdateView,
+    beforeEnter(to, from, next) {
+      if (store.getters.isLogin) {
+        next()
+      } else {
+        alert('로그인 해주세요')
+        store.commit('TOGGLE_LOGIN_MODAL', true)
+      }
+    },
+  },
+  {
+    path: '/post/:postId',
+    name: 'postDetail',
+    component: PostDetailView,
   },
   {
     path: '/profile/:username',
     name: 'profile',
     component: ProfileView,
+    beforeEnter(to, from, next) {
+      if (store.getters.isLogin) {
+        next()
+      } else {
+        alert('로그인 해주세요')
+        store.commit('TOGGLE_LOGIN_MODAL', true)
+      }
+    },
   },
   {
     path: '/search/:query',
@@ -79,5 +95,12 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 })
+
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch((err) => {
+    if (err.name !== 'NavigationDuplicated') throw err
+  })
+}
 
 export default router

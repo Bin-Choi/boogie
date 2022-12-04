@@ -36,6 +36,10 @@ INSTALLED_APPS = [
     'movies',
     'imagekit',
 
+    #ckeditor
+    'ckeditor',
+    'ckeditor_uploader',
+
     #crontab
     'django_crontab',
 
@@ -61,6 +65,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # django-cleanup 마지막에
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 SITE_ID = 1
@@ -192,6 +199,9 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# ckeditor path
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+CKEDITOR_IMAGE_BACKEND= 'pillow'
 
 
 # Default primary key field type

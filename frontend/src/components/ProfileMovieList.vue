@@ -1,11 +1,12 @@
 <template>
-  <div>
-    <p>영화 &#10084;</p>
-    <ProfileMovieListItem
-      v-for="movie in likeMovies"
-      :key="`movie-${movie.id}`"
-      :movie="movie"
-    />
+  <div class="p-3" :class="darkMode ? 'box-dark' : 'box-light'">
+    <h5 class="fw-bold">영화 &#10084;</h5>
+    <div>
+      <ProfileMovieListItem
+        v-for="movie in likeMovies"
+        :key="`movie-${movie.id}`"
+        :movie="movie" />
+    </div>
   </div>
 </template>
 
@@ -19,6 +20,11 @@ export default {
   },
   props: {
     likeMovies: Array,
+  },
+  computed: {
+    darkMode() {
+      return this.$store.state.darkMode
+    },
   },
 }
 </script>

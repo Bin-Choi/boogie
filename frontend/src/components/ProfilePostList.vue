@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <p>{{ postTitle }}</p>
+  <div class="p-3" :class="darkMode ? 'box-dark' : 'box-light'">
+    <h5 class="fw-bold">내가 작성한 글</h5>
     <ProfilePostListItem
       v-for="post in posts"
       :key="`my-${post.id}`"
@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ProfilePostListItem from '@/components/PostListItem.vue'
+import ProfilePostListItem from '@/components/ProfilePostListItem.vue'
 export default {
   name: 'ProfilePostList',
   components: {
@@ -18,7 +18,11 @@ export default {
   },
   props: {
     posts: Array,
-    postTitle: String,
+  },
+  computed: {
+    darkMode() {
+      return this.$store.state.darkMode
+    },
   },
 }
 </script>

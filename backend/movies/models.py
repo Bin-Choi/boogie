@@ -16,6 +16,7 @@ class Actor(models.Model):
 class Genre(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length = 30)
+    field_name = models.CharField(max_length = 30, default='')
 
 class Movie(models.Model):
     id = models.IntegerField(primary_key=True)

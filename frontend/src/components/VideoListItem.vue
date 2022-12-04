@@ -1,40 +1,13 @@
 <template>
-  <div>
-    <!-- <div class="popupVideo">
-      <a href="#layer" @click="openlayer"><iframe :src="videoURL" frameborder="0" width="300" height="200" allowfullscreen></iframe>
-      {{video.snippet.title}}
-      </a>
-    </div>
-    <div id="layer">
-      <div class="inner">
-        <div class="cont">
-          <iframe id="player" width="560" height="315" :src="videoURL" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <a herf="#none" class="close">close</a>
-      </div>
-    </div>
-    <div class ="dim"></div> -->
-    <!-- <div class="page">
-      <a href="#layer" class="button"><iframe id="player" width="560" height="315" src="https://www.youtube.com/embed/CUFwL9KYfIU" frameborder="0" allowfullscreen></iframe>{{movie.title}}</a>
-    </div>
-
-    <div id="layer">
-      <div class="inner">
-        <div class="cont">
-          <iframe id="player" width="560" height="315" src="https://www.youtube.com/embed/CUFwL9KYfIU" frameborder="0" allowfullscreen></iframe>
-        </div>
-        <a href="#none" class="close">close</a>
-      </div>
-    </div>
-    <div class="dim"></div> -->
+  <span class="ms-1 me-1">
     <iframe
       id="player"
       width="100%"
+      style="max-width: 250px"
       :src="videoURL"
       frameborder="0"
-      allowfullscreen
-    ></iframe>
-  </div>
+      allowfullscreen></iframe>
+  </span>
 </template>
 
 <script>
@@ -47,15 +20,15 @@ export default {
   },
 
   methods: {
-    // play() {
-    //   this.$emit('play', this.video)
-    // },
-    // openlayer(){
-    //   let path = this.attr('href')
-    //   this.cont.append(this.embed)
-    //   path.show()
-    //   this.dim.show()
-    // }
+    play() {
+      this.$emit('play', this.video)
+    },
+    openlayer() {
+      let path = this.attr('href')
+      this.cont.append(this.embed)
+      path.show()
+      this.dim.show()
+    },
   },
   computed: {
     videoURL() {
@@ -63,32 +36,6 @@ export default {
     },
   },
 }
-
-// $(function(){
-
-// 	var embed = $('#player'); //동영상 코드
-
-// 	$('.button').on('click', function(){ //레이어 열때
-// 		var path = $(this).attr('href');
-// 		$('.cont').append(embed);
-// 		$(path).show();
-// 		$('.dim').show();
-// 	})
-
-// 	$('.close').on('click', function(){ //레이어 닫을때
-// 		$(this).parents('#layer').hide();
-// 		$('.dim').hide();
-// 		$('.cont').empty();
-// 	})
-
-//   $('.dim').on('click', function(){
-//     $(this).hide();
-//     $('#layer').hide();
-//     $('.cont').empty();
-//   })
-
-// });
-//
 </script>
 
 <style></style>
