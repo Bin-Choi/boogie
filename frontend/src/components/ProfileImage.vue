@@ -1,25 +1,21 @@
 <template>
-  <div class="d-flex flex-column align-items-center">
-    <div class="d-flex">
-      <div id="profile-box">
-        <img :src="profileUrl" style="width: 100%" />
-      </div>
-      <div
-        v-if="person?.id === user?.id"
-        class="delete align-self-end"
-        @click="deleteProfile"
-      >
-        <img :src="require('@/assets/trashcan.png')" alt="" />
-      </div>
+  <div class="d-flex flex-column">
+    <div id="profile-box">
+      <img :src="profileUrl" style="width: 100%" />
     </div>
-    <div class="mt-3">
+    <div class="mt-3 d-flex align-items-center">
       <input
         v-if="person?.id === user?.id"
         style="width: 200px"
         type="file"
         accept="image/*"
-        @change="uploadProfile"
-      />
+        @change="uploadProfile" />
+      <div
+        v-if="person?.id === user?.id"
+        class="delete align-self-end"
+        @click="deleteProfile">
+        <img :src="require('@/assets/trashcan.png')" alt="" />
+      </div>
     </div>
   </div>
 </template>
@@ -94,8 +90,8 @@ export default {
 
 <style scoped>
 #profile-box {
-  width: 200px;
-  height: 200px;
+  max-width: 200px;
+  max-height: 200px;
   border-radius: 70%;
   overflow: hidden;
 }

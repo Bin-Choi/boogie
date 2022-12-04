@@ -7,60 +7,65 @@
         :style="{
           backgroundImage: `url(${backdropUrl})`,
         }">
-        <div class="d-flex profile-info p-4 mb-3">
-          <ProfileImage :person="person" @change_profile="changeProfile" />
-          <div class="ms-5">
-            <h4 class="fw-bold mt-3">{{ person?.username }}님의 프로필</h4>
-            <p class="mt-4">가입일: {{ dateJoined }}</p>
-            <p>점수: {{ person?.score }}점</p>
-            <p>
-              <span v-if="this.person?.genre_preference.length >= 1"
-                >{{ this.person?.genre_preference[0]['genre'] }}
-              </span>
-              <span v-if="this.person?.genre_preference.length >= 2">
-                | {{ this.person?.genre_preference[1]['genre'] }}
-              </span>
-              <span v-if="this.person?.genre_preference.length >= 3">
-                | {{ this.person?.genre_preference[2]['genre'] }}</span
-              >
-            </p>
-            <p
-              class="fw-bold"
-              style="cursor: pointer"
-              @click="$store.commit('TOGGLE_USERS_MODAL', true)">
-              <span @click="$store.commit('SAVE_USERS', person?.followings)"
-                >팔로잉: {{ person?.followings.length }}명 /
-              </span>
-              <span @click="$store.commit('SAVE_USERS', person?.followers)"
-                >팔로워: {{ person?.followers.length }}명</span
-              >
-            </p>
-            <div v-if="person?.id == user?.id" @click="withdraw">
-              <button type="button" class="btn btn-outline-danger">
-                회원탈퇴
-              </button>
-            </div>
-            <div v-if="person?.id !== user?.id" @click="follow">
-              <button
-                type="button"
-                :class="{
-                  btn: true,
-                  'btn-outline-primary': !person.is_followed,
-                  'btn-outline-secondary': person.is_followed,
-                }">
-                {{ person?.is_followed ? 'Unfollow' : 'Follow' }}
-              </button>
+        <div class="container profile-info mb-3 py-4 mx-2">
+          <div class="row">
+            <ProfileImage
+              class="col-6 ps-4"
+              :person="person"
+              @change_profile="changeProfile" />
+            <div class="col-6">
+              <h4 class="fw-bold mt-3">{{ person?.username }}님의 프로필</h4>
+              <p class="mt-4">가입일: {{ dateJoined }}</p>
+              <p>점수: {{ person?.score }}점</p>
+              <p>
+                <span v-if="this.person?.genre_preference.length >= 1"
+                  >{{ this.person?.genre_preference[0]['genre'] }}
+                </span>
+                <span v-if="this.person?.genre_preference.length >= 2">
+                  | {{ this.person?.genre_preference[1]['genre'] }}
+                </span>
+                <span v-if="this.person?.genre_preference.length >= 3">
+                  | {{ this.person?.genre_preference[2]['genre'] }}</span
+                >
+              </p>
+              <p
+                class="fw-bold"
+                style="cursor: pointer"
+                @click="$store.commit('TOGGLE_USERS_MODAL', true)">
+                <span @click="$store.commit('SAVE_USERS', person?.followings)"
+                  >팔로잉: {{ person?.followings.length }}명 /
+                </span>
+                <span @click="$store.commit('SAVE_USERS', person?.followers)"
+                  >팔로워: {{ person?.followers.length }}명</span
+                >
+              </p>
+              <div v-if="person?.id == user?.id" @click="withdraw">
+                <button type="button" class="btn btn-outline-danger">
+                  회원탈퇴
+                </button>
+              </div>
+              <div v-if="person?.id !== user?.id" @click="follow">
+                <button
+                  type="button"
+                  :class="{
+                    btn: true,
+                    'btn-outline-primary': !person.is_followed,
+                    'btn-outline-secondary': person.is_followed,
+                  }">
+                  {{ person?.is_followed ? 'Unfollow' : 'Follow' }}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-if="person?.id === user?.id" class="backdrop-input-delete">
-          <input
-            style="width: 200px"
-            type="file"
-            accept="image/*"
-            @change="uploadBackdrop" />
-          <div class="delete d-inline-block ms-3" @click="deleteBackdrop">
-            <img :src="require('@/assets/trashcan.png')" alt="" />
+          <div v-if="person?.id === user?.id" class="backdrop-input-delete">
+            <input
+              style="width: 200px"
+              type="file"
+              accept="image/*"
+              @change="uploadBackdrop" />
+            <div class="delete d-inline-block ms-3" @click="deleteBackdrop">
+              <img :src="require('@/assets/trashcan.png')" alt="" />
+            </div>
           </div>
         </div>
       </div>
@@ -240,6 +245,7 @@ export default {
 }
 
 .profile-info {
+  max-width: 500px;
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.61);
 }

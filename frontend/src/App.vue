@@ -98,8 +98,8 @@
         <div class="row justify-content-center mt-3">
           <div class="col-7 col-lg-3">
             <div class="fw-bold">Created by</div>
-            <div>
-              <div class="me-2">이병호</div>
+            <div class="mt-1">
+              <div>이병호</div>
               <a
                 href="https://github.com/Byongho96"
                 target="_blank"
@@ -125,7 +125,7 @@
               >
             </div>
             <div>
-              <div class="me-2">최성빈</div>
+              <div class="mt-2">최성빈</div>
               <a
                 href="https://github.com/Bin-Choi"
                 target="_blank"
@@ -153,7 +153,7 @@
           </div>
           <div class="col-5 col-lg-3">
             <span class="fw-bold">Powered by</span>
-            <div>
+            <div class="mt-2">
               <a href="https://developers.naver.com/main/" target="_blank">
                 <img
                   src="@/assets/naver_api_logo.jpg"
@@ -161,11 +161,10 @@
                   style="width: 100%; max-width: 200px; opacity: 0.8" />
               </a>
             </div>
-            <div>
+            <div class="mt-2">
               <a
                 href="https://developers.themoviedb.org/3/getting-started/introduction"
                 target="_blank"
-                class="mt-1"
                 style="padding-left: 4px">
                 <img
                   src="@/assets/tmdb_logo.svg"
@@ -173,11 +172,10 @@
                   style="width: 100%; max-width: 200px; opacity: 0.8" />
               </a>
             </div>
-            <div>
+            <div class="mt-2">
               <a
                 href="https://developers.google.com/youtube"
                 target="_blank"
-                class="mt-2"
                 style="padding-left: 3px">
                 <img
                   src="@/assets/developed-with-youtube-lowercase-light.png"
@@ -312,7 +310,7 @@ input::placeholder {
   min-height: 200px;
   padding: 15px;
   color: rgba(255, 255, 255, 0.566);
-  font-size: 1em;
+  font-size: 15px;
   text-align: left;
 }
 
