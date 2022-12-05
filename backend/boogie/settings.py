@@ -112,7 +112,7 @@ MIDDLEWARE = [
 #CRONTAB AWS 올리고 작업
 CRONJOBS = [
     ('* 0 * * *', 'movies.views.fill_movie_now_every_day', '>> schedule.log'),
-    ('* 1 * * 1', 'movies.views.ill_boxoffice_every_week', '>> schedule.log')
+    ('* 1 * * 1', 'movies.views.fill_boxoffice_every_week', '>> schedule.log')
 ]
 
 # CORS_ALLOW_ORIGINS = []
