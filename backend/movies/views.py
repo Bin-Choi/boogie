@@ -17,9 +17,10 @@ from .models import Movie, Actor, Genre, Director, Review, NowMovie, BoxOffice
 from datetime import datetime ,timedelta
 import requests
 
-# 로컬 서버 구동 시, 아래 값을 채워 넣어야 합니다.
+# 로컬 서버 구동 시, 모든 기능을 활용하기 위해서는 아래 값을 채워 넣어야 합니다.
 tmdb_api_key = None
 youtube_api_key = None
+kofic_api_key = None
 X_Naver_Client_Id = None
 X_Naver_Client_Secret = None
 
@@ -401,7 +402,7 @@ def fill_boxoffice():
     
     # 주간 박스오피스 요청 보내서 5개를 영화제목, 관객수, day=-1로 저장
     date = (datetime.now()-timedelta(days=7)).strftime('%Y%m%d')
-    url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={tmdb_api_key}&targetDt={date}&weekGb=0&itemPerPage=5'
+    url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={kofic_api_key}&targetDt={date}&weekGb=0&itemPerPage=5'
     response = requests.get(url)
     boxoffice_dict = response.json()
             
@@ -412,7 +413,7 @@ def fill_boxoffice():
     for day_dif in range(7, 0, -1):
         date = (datetime.now()-timedelta(days=day_dif)).strftime('%Y%m%d')
         
-        url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key={tmdb_api_key}&targetDt={date}&itemPerPage=10'
+        url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key={kofic_api_key}&targetDt={date}&itemPerPage=10'
         response = requests.get(url)
         boxoffice_dict = response.json()
             
