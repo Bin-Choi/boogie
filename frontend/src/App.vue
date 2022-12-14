@@ -8,6 +8,7 @@
         style="cursor: pointer">
         <img :src="require('@/assets/logo.png')" alt="" />
       </b-navbar-brand>
+      <b-nav-item :to="{ name: 'index' }">홈</b-nav-item>
       <b-nav-item :to="{ name: 'community' }">자유게시판</b-nav-item>
       <b-nav-item>
         <input
