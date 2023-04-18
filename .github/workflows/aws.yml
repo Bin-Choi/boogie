@@ -19,5 +19,12 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           script: |
-            cd ~
-            git clone https://github.com/Byongho96/boogie-project.git
+            cd ~/boogie-project
+            git pull
+            cd frontend
+            npm install
+            npm run build
+            cd ../backend
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart gunicorn
