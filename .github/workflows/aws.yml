@@ -1,9 +1,9 @@
-name: Deploy
+name: FE Deploy
 
 on:
   push:
     branches:
-      - main
+      - release/FE
 
 jobs:
   Deploy:
@@ -24,7 +24,3 @@ jobs:
             cd frontend
             npm install
             npm run build
-            cd ../backend
-            source venv/bin/activate
-            pip install -r requirements.txt
-            sudo systemctl restart gunicorn
