@@ -28,8 +28,7 @@ const store = new Vuex.Store({
   ],
 
   state: {
-    // 로컬 Django 서버 주소
-    API_URL: 'http://127.0.0.1:8000',
+    API_URL: process.env.VUE_APP_API_URL,
     darkMode: false,
 
     token: null,
