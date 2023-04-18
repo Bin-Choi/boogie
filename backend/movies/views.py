@@ -17,12 +17,14 @@ from .models import Movie, Actor, Genre, Director, Review, NowMovie, BoxOffice
 from datetime import datetime ,timedelta
 import requests
 
-# 로컬 서버 구동 시, 모든 기능을 활용하기 위해서는 아래 값을 채워 넣어야 합니다.
-tmdb_api_key = None
-youtube_api_key = None
-kofic_api_key = None
-X_Naver_Client_Id = None
-X_Naver_Client_Secret = None
+# API Keys
+from django.conf import settings
+
+TMDB_API_KEY = settings.TMDB_API_KEY
+YOUTUBE_API_KEY = settings.YOUTUBE_API_KEY
+KOFIC_API_KEY = settings.KOFIC_API_KEY
+NAVER_CLIENT_ID = settings.NAVER_CLIENT_ID
+NAVER_CLIENT_SECRET = settings.NAVER_CLIENT_SECRET
 
 # Create your views here.
 @api_view(['GET'])
@@ -195,7 +197,7 @@ def movie_list_related(request, movie_pk):
 def video_list(request, movie_title):
     url = f'https://www.googleapis.com/youtube/v3/search'
     params = {
-        'key': youtube_api_key,
+        'key': YOUTUBE_API_KEY,
         'part': 'id',
         'type': 'video',
         'maxResults': 5,
@@ -208,7 +210,7 @@ def video_list(request, movie_title):
 def tmdb_movie_list(request, query):
     url = f'https://api.themoviedb.org/3/search/movie'
     params = {
-        'api_key': tmdb_api_key,
+        'api_key': TMDB_API_KEY,
         'language': 'ko-KO',
         'query': query,
     }
@@ -263,8 +265,8 @@ def search_naver(request, query):
     url = f'https://openapi.naver.com/v1/search/blog.json?query={query}'
     headers = {
     'Accept': 'application/json',
-    'X-Naver-Client-Id': X_Naver_Client_Id,
-    'X-Naver-Client-Secret': X_Naver_Client_Secret,
+    'X-Naver-Client-Id': NAVER_CLIENT_ID,
+    'X-Naver-Client-Secret': NAVER_CLIENT_SECRET,
     }
     response = requests.get(url, headers= headers)
     return Response(response.json())
@@ -310,7 +312,7 @@ def save_movie(id):
     except:
         m = Movie()
     
-        url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key={tmdb_api_key}&language=ko-KO'
+        url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key={TMDB_API_KEY}&language=ko-KO'
         response = requests.get(url_detail)
         movie_detail = response.json()  # <class 'dict'>: {}
 
@@ -342,7 +344,7 @@ def save_movie(id):
             # print(genre)
             m.genres.add(Genre.objects.get(id=genre['id']))
         
-        url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key={tmdb_api_key}&language=ko-KO'
+        url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key={TMDB_API_KEY}&language=ko-KO'
         response = requests.get(url_credits)
         movie_credits = response.json() # <class 'dict'>
 
@@ -379,7 +381,7 @@ def fill_movie_now_every_day():
     fill_movie_now()
 
 def fill_movie_now():
-    url = f'https://api.themoviedb.org/3/movie/now_playing?api_key={tmdb_api_key}&language=ko-KO&page=1&region=KR'
+    url = f'https://api.themoviedb.org/3/movie/now_playing?api_key={TMDB_API_KEY}&language=ko-KO&page=1&region=KR'
     response = requests.get(url)
     show_dict = response.json()
 
@@ -402,7 +404,7 @@ def fill_boxoffice():
     
     # 주간 박스오피스 요청 보내서 5개를 영화제목, 관객수, day=-1로 저장
     date = (datetime.now()-timedelta(days=7)).strftime('%Y%m%d')
-    url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={kofic_api_key}&targetDt={date}&weekGb=0&itemPerPage=5'
+    url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchWeeklyBoxOfficeList.json?key={KOFIC_API_KEY}&targetDt={date}&weekGb=0&itemPerPage=5'
     response = requests.get(url)
     boxoffice_dict = response.json()
             
@@ -413,7 +415,7 @@ def fill_boxoffice():
     for day_dif in range(7, 0, -1):
         date = (datetime.now()-timedelta(days=day_dif)).strftime('%Y%m%d')
         
-        url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key={kofic_api_key}&targetDt={date}&itemPerPage=10'
+        url = f'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key={KOFIC_API_KEY}&targetDt={date}&itemPerPage=10'
         response = requests.get(url)
         boxoffice_dict = response.json()
             
@@ -423,7 +425,7 @@ def fill_boxoffice():
 
 #################### Step2. Step1의 genre 채우는 거 실행한 다음에 한번만 더 실행에서 영어이름 채워줌############################
 # def fill_genre_field_name(request):
-#     url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key={tmdb_api_key}&language=en-EN'
+#     url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key={TMDB_API_KEY}&language=en-EN'
 #     response = requests.get(url_genre)  # <class 'requests.models.Response'>: <Response [200]>
 #     genres_dict = response.json()        # <class 'dict'>: {'genres': [{'id', 'name'}]}
 #     genres= genres_dict['genres']
@@ -438,7 +440,7 @@ def fill_boxoffice():
 # def fill_data(request):
       #################### Step1. 이거는 한번만 실행하고 주석처리 ############################
 #     # # genres
-#     # url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key={tmdb_api_key}&language=ko-KO'
+#     # url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key={TMDB_API_KEY}&language=ko-KO'
 #     # response = requests.get(url_genre)  # <class 'requests.models.Response'>: <Response [200]>
 #     # genres_dict = response.json()        # <class 'dict'>: {'genres': [{'id', 'name'}]}
 #     # genres= genres_dict['genres']
@@ -451,7 +453,7 @@ def fill_boxoffice():
       ##########################################################################################
 
 #     for page in range(5, 11):
-#         url = f'https://api.themoviedb.org/3/movie/top_rated?api_key={tmdb_api_key}&language=ko-KO&page={page}&region=KR'
+#         url = f'https://api.themoviedb.org/3/movie/top_rated?api_key={TMDB_API_KEY}&language=ko-KO&page={page}&region=KR'
 #         response = requests.get(url)
 #         movie_dict = response.json()        # <class 'dict'>: {'page': 1, 'results': [{}]}
 #         movies = movie_dict['results']
@@ -467,7 +469,7 @@ def fill_boxoffice():
 #             except:
 #                 m = Movie()
                 
-#                 url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key={tmdb_api_key}&language=ko-KO'
+#                 url_detail = f'https://api.themoviedb.org/3/movie/{id}?api_key={TMDB_API_KEY}&language=ko-KO'
 #                 response = requests.get(url_detail)
 #                 movie_detail = response.json()  # <class 'dict'>: {}
 
@@ -499,7 +501,7 @@ def fill_boxoffice():
 #                     # print(genre)
 #                     m.genres.add(Genre.objects.get(id=genre['id']))
                 
-#                 url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key={tmdb_api_key}&language=ko-KO'
+#                 url_credits = f'https://api.themoviedb.org/3/movie/{id}/credits?api_key={TMDB_API_KEY}&language=ko-KO'
 #                 response = requests.get(url_credits)
 #                 movie_credits = response.json() # <class 'dict'>
 
