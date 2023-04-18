@@ -21,6 +21,7 @@ jobs:
           script: |
             cd ~/boogie-project
             git pull
+            
             cd frontend
             npm install
             npm run build
