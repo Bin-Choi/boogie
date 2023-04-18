@@ -21,6 +21,7 @@ jobs:
           script: |
             cd ~/boogie-project
             git pull
+            git switch release/BE
             cd backend
             source venv/bin/activate
             pip install -r requirements.txt
