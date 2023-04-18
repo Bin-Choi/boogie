@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,django,windows,macos,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,django,windows,macos,visualstudiocode
 
+# real database
+db.json
+
 ### Django ###
 *.log
 *.pot

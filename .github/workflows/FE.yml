@@ -1,0 +1,26 @@
+name: FE Deploy
+
+on:
+  push:
+    branches:
+      - release/FE
+
+jobs:
+  Deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2 
+      - name: SSH
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          script: |
+            cd ~/boogie-project
+            git pull
+            cd frontend
+            npm install
+            npm run build
