@@ -38,7 +38,7 @@ export default {
       return this.$store.state.user
     },
     profileUrl() {
-      return `${this.$store.state.API_URL}${this.person.profile_image}`
+      return `${this.$store.state.SERVER_URL}${this.person.profile_image}`
     },
   },
   methods: {

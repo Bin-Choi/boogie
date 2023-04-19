@@ -121,7 +121,7 @@ export default {
       return new Date(this.person?.date_joined).toLocaleDateString()
     },
     backdropUrl() {
-      return `${this.$store.state.API_URL}${this.person.backdrop_image}`
+      return `${this.$store.state.SERVER_URL}${this.person.backdrop_image}`
     },
   },
   created() {
