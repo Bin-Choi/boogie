@@ -78,7 +78,7 @@ def follow(request, user_pk):
                 you.followers.remove(me)
                 is_followed = False
             else:
-                you.followers.add(me)
+                print(str(you.followers.add(me)))
                 is_followed = True
             data = {
                 'is_followed': is_followed,
