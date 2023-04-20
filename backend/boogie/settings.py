@@ -48,7 +48,8 @@ NAVER_CLIENT_SECRET = env('NAVER_CLIENT_SECRET')
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '15.164.99.39',
+    '43.201.167.181',
+    'boogie-movie.site'
 ]
 
 # Application definition
