@@ -1,8 +1,8 @@
 # Boogie Project
 
-**Vue 클라이언트 주소**
+**Website 주소**
 
-- https://boogiee-site.netlify.app/
+- https://boogie-movie.site/
 
 배포서버는 22년 12월 기준으로 약 6개월 가량 유지할 **계획**입니다. 만일 서버 접속이 원할하지 않을 경우, 본 프로젝트를 clone하여 로컬 서버로 간이 구동이 가능합니다.
 
