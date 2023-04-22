@@ -109,7 +109,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const isLiked = res.data.is_liked
           this.movie.is_liked = isLiked
           if (isLiked) {

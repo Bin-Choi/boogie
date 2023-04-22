@@ -18,15 +18,11 @@
 
           <div class="modal-body">
             <slot name="body">
-              <div v-for="(error, key) in errors" :key="key" :error="error">
-                {{ key }}
-                <p
-                  style="font-size: 15px; font-weight: normal"
-                  v-for="msg in error"
-                  :key="msg">
-                  {{ msg }}
-                </p>
-              </div>
+              <ul v-if="errors">
+                <li v-for="(err, i) in errors" :index="i" :key="i + `-err`">
+                  {{ err }}
+                </li>
+              </ul>
               <label for="username">username</label>
               <input type="text" id="username" v-model="username" /><br />
 
@@ -104,8 +100,12 @@ export default {
           this.$emit('close')
         })
         .catch((err) => {
-          console.log(err)
-          this.errors = err.response.data
+          let errLst = []
+          const errObj = err.response.data
+          for (const key in errObj) {
+            errLst.push(...errObj[key])
+          }
+          this.errors = errLst
         })
     },
     toLogin() {

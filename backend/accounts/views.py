@@ -76,7 +76,7 @@ def follow(request, user_pk):
         if me != you:
             if you.followers.filter(pk=me.pk).exists():
                 you.followers.remove(me)
-                is_followed = False
+                is_followed = False33333333333333333333333333
             else:
                 you.followers.add(me)
                 is_followed = True

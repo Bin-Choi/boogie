@@ -1,29 +1,34 @@
 <template>
-  <div class="now-showing p-3">
-    <h1 class="fw-bold" style="color: #ffffffde; font-size: 50px">
+  <div class="now-showing px-5 py-3">
+    <h1 class="fw-bold my-4" style="color: #ffffffde; font-size: 50px">
       NOW SHOWING
     </h1>
-    <carousel-3d
+    <carousel
       :autoplay="true"
       :autoplay-timeout="2300"
-      :controls-visible="true"
-      :controls-prev-html="'&#10092; '"
-      :controls-next-html="'&#10093;'"
-      :controls-width="30"
-      :controls-height="60"
-      :clickable="true"
-      :space="300"
-      :width="300"
-      :height="420">
+      :autoplay-hover-pause="true"
+      :center-mode="true"
+      :loop="true"
+      :per-page="1"
+      :per-page-custom="[
+        [425, 2],
+        [768, 3],
+        [1024, 5],
+      ]"
+      :pagination-active-color="`#ffffff`"
+      :pagination-color="`#545454`"
+      :pagination-position="`bottom-overlay`"
+      ref="carousel">
       <slide v-for="(movie, i) in nowMovies" :index="i" :key="movie.id">
-        <NowMovieListItem :movie="movie" style="cursor: pointer" />
+        <NowMovieListItem :movie="movie" />
       </slide>
-    </carousel-3d>
+    </carousel>
   </div>
 </template>
 
 <script>
-import { Carousel3d, Slide } from 'vue-carousel-3d'
+// import { Carousel3d, Slide } from 'vue-carousel-3d'
+import { Carousel, Slide } from 'vue-carousel'
 import NowMovieListItem from '@/components/NowMovieListItem.vue'
 import axios from 'axios'
 
@@ -33,7 +38,9 @@ export default {
   name: 'NowMovieList',
   components: {
     NowMovieListItem,
-    Carousel3d,
+    // Carousel3d,
+    // Slide,
+    Carousel,
     Slide,
   },
   data() {
@@ -49,7 +56,14 @@ export default {
   created() {
     this.getNowMovies()
   },
+  mounted() {
+    setTimeout(this.$refs.carousel.computeCarouselWidth, 300)
+  },
   methods: {
+    imageLoaded() {
+      console.log('force load')
+      this.$refs.carousel.$forceUpdate()
+    },
     getNowMovies() {
       axios({
         method: 'get',

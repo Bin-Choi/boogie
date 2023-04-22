@@ -17,7 +17,11 @@
 
           <div class="modal-body">
             <slot name="body">
-              <p v-if="error">{{ error }}</p>
+              <ul v-if="errors">
+                <li v-for="(err, i) in errors" :index="i" :key="i + `-err`">
+                  {{ err }}
+                </li>
+              </ul>
               <label for="username">username</label>
               <input type="text" id="username" v-model="username" /><br />
 
@@ -59,7 +63,7 @@ export default {
     return {
       username: null,
       password: null,
-      error: null,
+      errors: null,
     }
   },
   computed: {
@@ -80,7 +84,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           this.username = null
           this.password = null
           this.error = null
@@ -89,8 +92,12 @@ export default {
           this.$store.dispatch('getUserInfo')
         })
         .catch((err) => {
-          console.log(err)
-          this.error = err.response.data
+          let errLst = []
+          const errObj = err.response.data
+          for (const key in errObj) {
+            errLst.push(...errObj[key])
+          }
+          this.errors = errLst
         })
     },
     toSignUp() {
@@ -178,7 +185,6 @@ export default {
 }
 
 .to-signup-btn {
-  float: right;
   background-color: #d4d4d4;
   color: white;
 }

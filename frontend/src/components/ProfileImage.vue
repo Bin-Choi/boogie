@@ -59,7 +59,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const profileImage = res.data.profile_image
           this.$emit('change_profile', profileImage)
         })
@@ -76,7 +75,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const profileImage = res.data.profile_image
           this.$emit('change_profile', profileImage)
         })

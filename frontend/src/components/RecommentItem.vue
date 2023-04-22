@@ -40,8 +40,7 @@ export default {
           Authorization: `Token ${this.$store.state.token}`,
         },
       })
-        .then((res) => {
-          console.log(res)
+        .then(() => {
           this.$emit('get_comments')
         })
         .catch((err) => {

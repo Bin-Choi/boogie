@@ -44,7 +44,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const backdropImage = res.data.backdrop_image
           this.$emit('change_backdrop', backdropImage)
         })
@@ -61,7 +60,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const backdropImage = res.data.backdrop_image
           this.$emit('change_backdrop', backdropImage)
         })

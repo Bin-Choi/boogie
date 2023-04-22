@@ -61,7 +61,6 @@ export default {
           },
         })
           .then((res) => {
-            console.log(res)
             this.recoMovies = res.data
           })
           .catch((err) => {
@@ -73,7 +72,6 @@ export default {
           url: `${this.API_URL}/movies/recommend/unlogin/`,
         })
           .then((res) => {
-            console.log(res)
             this.recoMovies = res.data
           })
           .catch((err) => {

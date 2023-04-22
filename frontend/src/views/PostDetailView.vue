@@ -94,7 +94,6 @@ export default {
           },
         })
           .then((res) => {
-            console.log(res)
             const post = res.data
             this.post = post
           })
@@ -107,7 +106,6 @@ export default {
           url: `${this.API_URL}/community/posts/${this.$route.params.postId}/unlogin/`,
         })
           .then((res) => {
-            console.log(res)
             const post = res.data
             this.post = post
           })
@@ -124,8 +122,7 @@ export default {
           Authorization: `Token ${this.$store.state.token}`,
         },
       })
-        .then((res) => {
-          console.log(res)
+        .then(() => {
           this.$router.push({ name: 'community' })
         })
         .catch((err) => {
@@ -146,7 +143,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const isLiked = res.data.is_liked
           this.post.is_liked = isLiked
           if (isLiked) {

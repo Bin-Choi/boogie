@@ -279,6 +279,8 @@ input::placeholder {
 .nav {
   background-color: #310e58;
   padding: 15px;
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .nav a {

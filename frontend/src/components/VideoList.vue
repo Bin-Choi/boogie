@@ -50,7 +50,6 @@ export default {
         url: `${this.API_URL}/movies/${this.movie.title}/videos/`,
       })
         .then((res) => {
-          console.log(res)
           this.videoList = res.data.items
         })
         .catch((err) => {
