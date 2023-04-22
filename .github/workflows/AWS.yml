@@ -1,4 +1,4 @@
-name: FE Deploy
+name: AWS Deploy
 
 on:
   push:
