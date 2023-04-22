@@ -3,7 +3,7 @@ name: FE Deploy
 on:
   push:
     branches:
-      - release/FE
+      - main
 
 jobs:
   Deploy:
@@ -21,7 +21,12 @@ jobs:
           script: |
             cd ~/boogie-project
             git pull
-            git switch release/FE
+            git switch main
             cd frontend
             npm install
             npm run build
+            cd ../backend
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart gunicorn
+
