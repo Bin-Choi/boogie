@@ -188,7 +188,7 @@ VUE_APP_SERVER_URL=http://boogie-movie.site
 
 # 3. EC2
 
-아래 내용은 AWS EC2상에서 진행된다. EC2와 ssh 키가 없거나 접속하는 법을 모르면 [AWS EC2 기초 가이드]()를 참고하면 된다.
+아래 내용은 AWS EC2상에서 진행된다. EC2와 ssh 키가 없거나 접속하는 법을 모르면 [AWS EC2 기초 가이드](https://github.com/Byongho96/TIL/blob/master/Tools/AWS.md)를 참고하면 된다.
 
 ## 3.1. pyenv 설치
 
