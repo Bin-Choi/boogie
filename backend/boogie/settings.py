@@ -44,7 +44,6 @@ YOUTUBE_API_KEY = env('YOUTUBE_API_KEY')
 KOFIC_API_KEY = env('KOFIC_API_KEY')
 NAVER_CLIENT_ID = env('NAVER_CLIENT_ID')
 NAVER_CLIENT_SECRET = env('NAVER_CLIENT_SECRET')
-REDIS_PASSWORD=env('REDIS_PASSWORD')
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -180,7 +179,6 @@ CACHES = {
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": {REDIS_PASSWORD}
         }
     }
 }
