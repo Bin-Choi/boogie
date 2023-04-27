@@ -16,7 +16,7 @@ import os
 
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, True)
+    DEBUG=(bool, False)
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,6 +44,7 @@ YOUTUBE_API_KEY = env('YOUTUBE_API_KEY')
 KOFIC_API_KEY = env('KOFIC_API_KEY')
 NAVER_CLIENT_ID = env('NAVER_CLIENT_ID')
 NAVER_CLIENT_SECRET = env('NAVER_CLIENT_SECRET')
+REDIS_PASSWORD=env('REDIS_PASSWORD')
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -173,6 +174,16 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PASSWORD": {REDIS_PASSWORD}
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

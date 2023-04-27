@@ -56,14 +56,7 @@ export default {
   created() {
     this.getNowMovies()
   },
-  mounted() {
-    setTimeout(this.$refs.carousel.computeCarouselWidth, 300)
-  },
   methods: {
-    imageLoaded() {
-      console.log('force load')
-      this.$refs.carousel.$forceUpdate()
-    },
     getNowMovies() {
       axios({
         method: 'get',

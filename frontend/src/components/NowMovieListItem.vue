@@ -1,7 +1,12 @@
 <template>
   <div
     @click="toMovieDetail"
-    style="position: relative; width: 100%; padding-bottom: 133%">
+    style="
+      position: relative;
+      width: 100%;
+      padding-bottom: 133%;
+      cursor: pointer;
+    ">
     <img
       style="
         position: absolute;
