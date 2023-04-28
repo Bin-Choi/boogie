@@ -396,7 +396,7 @@ def fill_movie_now():
         movie_data["poster_path"] = movie["poster_path"]
         data.append(movie_data)
 
-    cache.set('now_movie', data)    # redis에 캐싱
+    cache.set('now_movie', data, timeout=None)    # redis에 캐싱
 
 def fill_boxoffice_every_week():
     fill_boxoffice()
