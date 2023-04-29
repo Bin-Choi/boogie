@@ -60,7 +60,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const post = res.data
           this.title = post.title
           this.content = post.content
@@ -81,8 +80,7 @@ export default {
           Authorization: `Token ${this.$store.state.token}`,
         },
       })
-        .then((res) => {
-          console.log(res)
+        .then(() => {
           this.$router.push({
             name: 'postDetail',
             params: { postId: this.$route.params.postId },

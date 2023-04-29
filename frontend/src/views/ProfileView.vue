@@ -121,7 +121,7 @@ export default {
       return new Date(this.person?.date_joined).toLocaleDateString()
     },
     backdropUrl() {
-      return `${this.$store.state.API_URL}${this.person.backdrop_image}`
+      return `${this.$store.state.SERVER_URL}${this.person.backdrop_image}`
     },
   },
   created() {
@@ -137,7 +137,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const person = res.data
           this.person = person
         })
@@ -158,7 +157,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const isFollowed = res.data.is_followed
           this.person.is_followed = isFollowed
           if (isFollowed) {
@@ -191,7 +189,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           this.person.backdrop_image = res.data.backdrop_image
         })
         .catch((err) => {
@@ -207,7 +204,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           this.person.backdrop_image = res.data.backdrop_image
         })
         .catch((err) => {
@@ -222,8 +218,7 @@ export default {
           Authorization: `Token ${this.$store.state.token}`,
         },
       })
-        .then((res) => {
-          console.log(res)
+        .then(() => {
           this.$store.commit('WITHDRAW')
           this.$router.push({ name: 'index' })
         })

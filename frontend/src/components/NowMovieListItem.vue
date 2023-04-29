@@ -1,7 +1,23 @@
 <template>
-  <figure @click="toMovieDetail">
-    <img :src="poster_url" style="height: 100%" />
-  </figure>
+  <div
+    @click="toMovieDetail"
+    style="
+      position: relative;
+      width: 100%;
+      padding-bottom: 133%;
+      cursor: pointer;
+    ">
+    <img
+      style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      "
+      :src="poster_url" />
+  </div>
 </template>
 
 <script>

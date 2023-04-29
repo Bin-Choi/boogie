@@ -44,7 +44,6 @@ export default {
         url: `${this.API_URL}/movies/${this.$route.params.query}/tmdb/`,
       })
         .then((res) => {
-          console.log(res)
           this.searchMovies = res.data.results.slice(0, 5)
         })
         .catch((err) => {

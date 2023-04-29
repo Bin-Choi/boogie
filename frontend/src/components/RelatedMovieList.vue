@@ -53,7 +53,6 @@ export default {
         url: `${this.API_URL}/movies/${movieId}/related/`,
       })
         .then((res) => {
-          console.log(res)
           this.relatedMovies = res.data
         })
         .catch((err) => {

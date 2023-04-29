@@ -23,7 +23,7 @@ export default {
       return this.$store.state.API_URL
     },
     backdropUrl() {
-      return `${this.$store.state.API_URL}${this.person.backdrop_image}`
+      return `${this.$store.state.SERVER_URL}${this.person.backdrop_image}`
     },
   },
   methods: {
@@ -44,7 +44,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const backdropImage = res.data.backdrop_image
           this.$emit('change_backdrop', backdropImage)
         })
@@ -61,7 +60,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const backdropImage = res.data.backdrop_image
           this.$emit('change_backdrop', backdropImage)
         })

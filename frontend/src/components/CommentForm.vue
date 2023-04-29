@@ -55,8 +55,7 @@ export default {
           Authorization: `Token ${this.$store.state.token}`,
         },
       })
-        .then((res) => {
-          console.log(res)
+        .then(() => {
           this.content = ''
           // 댓글목록 다시 가져오기
           this.$emit('get_comments')

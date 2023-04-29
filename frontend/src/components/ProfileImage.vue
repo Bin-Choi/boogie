@@ -38,7 +38,7 @@ export default {
       return this.$store.state.user
     },
     profileUrl() {
-      return `${this.$store.state.API_URL}${this.person.profile_image}`
+      return `${this.$store.state.SERVER_URL}${this.person.profile_image}`
     },
   },
   methods: {
@@ -59,7 +59,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const profileImage = res.data.profile_image
           this.$emit('change_profile', profileImage)
         })
@@ -76,7 +75,6 @@ export default {
         },
       })
         .then((res) => {
-          console.log(res)
           const profileImage = res.data.profile_image
           this.$emit('change_profile', profileImage)
         })

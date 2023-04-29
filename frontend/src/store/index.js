@@ -28,7 +28,8 @@ const store = new Vuex.Store({
   ],
 
   state: {
-    API_URL: process.env.VUE_APP_API_URL,
+    SERVER_URL: process.env.VUE_APP_SERVER_URL,
+    API_URL: process.env.VUE_APP_SERVER_URL + '/api',
     darkMode: false,
 
     token: null,
@@ -112,7 +113,6 @@ const store = new Vuex.Store({
         },
       })
         .then(() => {
-          // console.log(res)
           context.commit('LOG_OUT')
         })
         .catch((err) => {
@@ -163,7 +163,6 @@ const store = new Vuex.Store({
           },
         })
           .then((res) => {
-            console.log(res)
             const movie = res.data
             context.commit('GET_MOVIE', movie)
           })
@@ -177,7 +176,6 @@ const store = new Vuex.Store({
           url: `${context.state.API_URL}/movies/${movieId}/unlogin/`,
         })
           .then((res) => {
-            console.log(res)
             const movie = res.data
             context.commit('GET_MOVIE', movie)
           })

@@ -4,8 +4,7 @@
     <SearchPostListItem
       v-for="(post, index) in searchList"
       :key="index"
-      :post="post"
-    />
+      :post="post" />
   </div>
 </template>
 
@@ -45,7 +44,6 @@ export default {
         url: `${this.API_URL}/community/posts/search/${this.$route.params.query}/`,
       })
         .then((res) => {
-          console.log(res)
           this.searchList = res.data
         })
         .catch((err) => {

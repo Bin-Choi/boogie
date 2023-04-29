@@ -16,6 +16,8 @@ from .models import Movie, Actor, Genre, Director, Review, NowMovie, BoxOffice
 
 from datetime import datetime ,timedelta
 import requests
+from django.core.cache import cache
+
 
 # API Keys
 from django.conf import settings
@@ -227,9 +229,8 @@ def review_list_recent(request):
 
 @api_view(['GET'])
 def movie_list_now(request):
-    now_show = NowMovie.objects.all()
-    serializer = NowMovieSerializer(now_show, many=True)
-    return Response(serializer.data)
+    data = cache.get('now_movie')   # redis에서 캐싱된 데이터를 읽어온다
+    return Response(data)
 
 @api_view(['GET'])     
 def boxoffice(request):
@@ -302,7 +303,7 @@ def movie_list_recommend(request):
 
     return Response(movies[:10])
 
-######################################################3
+#########################################이하는 Cron Job을 위한 함수###############################################
 
 def save_movie(id):
     try:
@@ -385,14 +386,18 @@ def fill_movie_now():
     response = requests.get(url)
     show_dict = response.json()
 
-    now_show = NowMovie.objects.all()
-    for movie in now_show:
-        movie.delete()
-    
+    # 10개의 영화 중 필요한 데이터만 뽑아서 가공
+    data = []
     for movie in show_dict.get("results")[:10]:
-        save_movie(movie['id']) # 데이터베이스에도 저장
-        NowMovie.objects.create(id = movie['id'], title= movie["title"], vote_average = movie["vote_average"], poster_path = movie["poster_path"])
-   
+        movie_data = {}
+        movie_data["id"] = movie["id"]
+        movie_data["title"] = movie["title"]
+        movie_data["vote_average"] = movie["vote_average"]
+        movie_data["poster_path"] = movie["poster_path"]
+        data.append(movie_data)
+
+    cache.set('now_movie', data, timeout=None)    # redis에 캐싱
+
 def fill_boxoffice_every_week():
     fill_boxoffice()
 
@@ -421,9 +426,10 @@ def fill_boxoffice():
             
         for movie in boxoffice_dict['boxOfficeResult']['dailyBoxOfficeList']:
             BoxOffice.objects.create(title= movie['movieNm'], audi_cnt = movie['audiCnt'], day=7-day_dif)
-     
 
-#################### Step2. Step1의 genre 채우는 거 실행한 다음에 한번만 더 실행에서 영어이름 채워줌############################
+###################################이하는 초기 데이터를 API를 통해 채우기 위한 함수######################################
+
+#################### Step2. Step1의 genre 채우는 거 실행한 다음에 한번만 더 실행해서 영어이름 채워줌###################
 # def fill_genre_field_name(request):
 #     url_genre = f'https://api.themoviedb.org/3/genre/movie/list?api_key={TMDB_API_KEY}&language=en-EN'
 #     response = requests.get(url_genre)  # <class 'requests.models.Response'>: <Response [200]>
@@ -450,7 +456,7 @@ def fill_boxoffice():
 #     #         Genre.objects.get(id=genre.get('id'))
 #     #     except:
 #     #         Genre.objects.create(id=genre.get('id'), name=genre.get('name'))
-      ##########################################################################################
+      #######################################################################################
 
 #     for page in range(5, 11):
 #         url = f'https://api.themoviedb.org/3/movie/top_rated?api_key={TMDB_API_KEY}&language=ko-KO&page={page}&region=KR'

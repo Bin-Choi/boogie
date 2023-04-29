@@ -48,7 +48,8 @@ NAVER_CLIENT_SECRET = env('NAVER_CLIENT_SECRET')
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    '15.164.99.39',
+    '43.201.167.181',
+    'boogie-movie.site'
 ]
 
 # Application definition
@@ -134,8 +135,8 @@ MIDDLEWARE = [
 
 #CRONTAB AWS 올리고 작업
 CRONJOBS = [
-    ('* 0 * * *', 'movies.views.fill_movie_now_every_day', '>> schedule.log'),
-    ('* 1 * * 1', 'movies.views.fill_boxoffice_every_week', '>> schedule.log')
+    ('* 0 * * *', 'movies.views.fill_movie_now_every_day', '>> schedule.log'),  # 매일 오늘 상영 영화
+    ('* 1 * * 1', 'movies.views.fill_boxoffice_every_week', '>> schedule.log')  # 지난주 top10 영화
 ]
 
 # CORS_ALLOW_ORIGINS = []
@@ -172,6 +173,15 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -195,9 +205,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -212,7 +222,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 # app/static/ 외의 추가 경로
 STATICFILES_DIRS = [
     # BASE_DIR / 'static',
@@ -224,8 +233,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # ckeditor path
 CKEDITOR_UPLOAD_PATH = 'uploads/'
-CKEDITOR_IMAGE_BACKEND= 'pillow'
 
+CKEDITOR_IMAGE_BACKEND= 'pillow'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
